@@ -1,0 +1,15 @@
+clear
+as main.s -o main.o
+as read_input.s -o read_input.o
+as gpio_input.s -o gpio_input.o
+as print_char.s -o print_char.o
+as debug_print.s -o debug_print.o
+ld -o main /usr/lib/arm-linux-gnueabihf/libc.so \
+  read_input.o \
+  gpio_input.o \
+  print_char.o \
+  debug_print.o \
+  main.o \
+-dynamic-linker /lib/ld-linux-armhf.so.3
+./main
+
