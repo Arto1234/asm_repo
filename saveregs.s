@@ -81,39 +81,37 @@ aux_reg_val:
 .global saveregs
 .type saveregs, %function
 saveregs:
-    ldr r10, =r0_save_addr   // Load address for the global variable to some reg (r10)
-    mov r10, r0            // Save r0 to global variable
-//    str r0, [r10]
+    ldr r10, =r0_save        // Load address for the global variable to some reg (r10)
+    str r0, [r10]            // Save r0 to global variable
 
-    ldr r10, =r1_save_addr   // Load address for the global variable to some reg (r10)
-    ldr r11, [r10]
-    mov r10, r1            // Save r1 to global variable
+    ldr r10, =r1_save        // Load address for the global variable to some reg (r10)
+    str r1, [r10]            // Save r1 to global variable
 
-    ldr r10, =r2_save_addr   // Load address for the global variable to some reg (r10)
+    ldr r10, =r2_save        // Load address for the global variable to some reg (r10)
     str r2, [r10]            // Save r2 to global variable
 
-    ldr r10, =r3_save_addr   // Load address for the global variable to some reg (r10)
+    ldr r10, =r3_save        // Load address for the global variable to some reg (r10)
     str r3, [r10]            // Save r3 to global variable
 
-    ldr r10, =r4_save_addr   // Load address for the global variable to some reg (r10)
+    ldr r10, =r4_save        // Load address for the global variable to some reg (r10)
     str r4, [r10]            // Save r4 to global variable
 
-    ldr r10, =r5_save_addr   // Load address for the global variable to some reg (r10)
+    ldr r10, =r5_save        // Load address for the global variable to some reg (r10)
     str r5, [r10]            // Save r5 to global variable
 
-    ldr r10, =r6_save_addr   // Load address for the global variable to some reg (r10)
+    ldr r10, =r6_save        // Load address for the global variable to some reg (r10)
     str r6, [r10]            // Save r6 to global variable
 
-    ldr r10, =r7_save_addr   // Load address for the global variable to some reg (r10)
+    ldr r10, =r7_save        // Load address for the global variable to some reg (r10)
     str r7, [r10]            // Save r7 to global variable
 
-    ldr r10, =r8_save_addr   // Load address for the global variable to some reg (r10)
+    ldr r10, =r8_save        // Load address for the global variable to some reg (r10)
     str r8, [r10]            // Save r8 to global variable
 
-    ldr r10, =r9_save_addr   // Load address for the global variable to some reg (r10)
+    ldr r10, =r9_save        // Load address for the global variable to some reg (r10)
     str r9, [r10]            // Save r9 to global variable
 
-    ldr r9, =r10_save_addr   // Load address for the global variable to some reg (r9)
+    ldr r9, =r10_save        // Load address for the global variable to some reg (r9)
     str r10, [r9]            // Save r10 to global variable
 
     bx lr
