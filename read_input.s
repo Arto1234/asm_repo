@@ -1,7 +1,7 @@
 /* read_input.s
 This function reads one character from stdin and accepts values 0..9.
 It reads input and returns it to _start.
-Value is returned in r5 as plain 1-byte digit.
+Value is returned in r3 as plain 1-byte digit.
 '0' (ASCII 48) returned as 0
 '1' (ASCII 49) returned as 1
 '2' (ASCII 50) returned as 2
@@ -14,7 +14,6 @@ Value is returned in r5 as plain 1-byte digit.
 '9' (ASCII 57) returned as 9
 TODO: better input handling. Now is read only one char.
 Later could be read until <enter>.
-Identify cpu, floating-point and syntax
 Arto Rasimus 1.3.2021 */
 .cpu cortex-a53
 .fpu neon-fp-armv8
@@ -51,6 +50,7 @@ msg_err_wrong_input:
 .global read_input
 read_input:
 .type read_input, %function
+
 begin_function:
     // print question string
     mov r0, $1         // syscall
@@ -65,19 +65,19 @@ begin_function:
     mov r7, $3         // Load syscall SYS_READ (3) into r7
     swi $0             // Invoke the system call
 
-    ldr r5, [r1]       // save reference of character to r5
-    and r5, r5, $0x0FF // the enter is masked off
+    ldr r3, [r1]       // save reference of character to r3
+    and r3, r3, $0x0FF // the enter is masked off
 
 begin_if:
     // check input: 0 - 9
-    cmp r5, $48         // is < '0'
+    cmp r3, $48         // is < '0'
     blt out_of_limits
 
-    cmp r5, $57         // is > '9'
+    cmp r3, $57         // is > '9'
     bgt out_of_limits
 
 value_ok:
-    sub r5, $48         // value is valid. Convert ASCII to number
+    sub r3, $48         // value is valid. Convert ASCII to number
     b end
 
 out_of_limits:

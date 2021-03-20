@@ -1,8 +1,7 @@
 /* debug_print.s
 This function prints several ARMv7 registers' contents as 8-digit hex to stdout.
 Purpose is to help debugging in development phase.
-Identify cpu, floating-point and syntax
-Arto Rasimus 1.3.2021 */
+Arto Rasimus 20.3.2021 */
 .cpu cortex-a53
 .fpu neon-fp-armv8
 .syntax unified
@@ -12,45 +11,50 @@ Arto Rasimus 1.3.2021 */
 @       Data Section
 @ ---------------------------------------
 .section .data
+
+
 str_function_name:
-    .asciz "debug_print()\n"
+    .asciz "\n\ndebug_print()\n"
     strlen_function_name = .-str_function_name
 str_r0:
-    .asciz "r0 = 0x"
+    .ascii "r0  = 0x"
     strlen_r0 = .-str_r0
 str_r1:
-    .asciz "r1 = 0x"
+    .ascii "r1  = 0x"
     strlen_r1 = .-str_r1
 str_r2:
-    .asciz "r2 = 0x"
+    .ascii "r2  = 0x"
     strlen_r2 = .-str_r2
 str_r3:
-    .asciz "r3 = 0x"
+    .ascii "r3  = 0x"
     strlen_r3 = .-str_r3
 str_r4:
-    .asciz "r4 = 0x"
+    .ascii "r4  = 0x"
     strlen_r4 = .-str_r4
 str_r5:
-    .asciz "r5 = 0x"
+    .ascii "r5  = 0x"
     strlen_r5 = .-str_r5
 str_r6:
-    .asciz "r6 = 0x"
+    .ascii "r6  = 0x"
     strlen_r6 = .-str_r6
 str_r7:
-    .asciz "r7 = 0x"
+    .ascii "r7  = 0x"
     strlen_r7 = .-str_r7
 str_r8:
-    .asciz "r8 = 0x"
+    .ascii "r8  = 0x"
     strlen_r8 = .-str_r8
 str_r9:
-    .asciz "r9 = 0x"
+    .ascii "r9  = 0x"
     strlen_r9 = .-str_r9
+str_r10:
+    .ascii "r10 = 0x"
+    strlen_r10 = .-str_r10
 
 @ ---------------------------------------
 @       Block Starting Symbol Section
 @ ---------------------------------------
-@ The portion of an object that contains statically-allocated variables
-@ that are declared but have not been assigned a value yet
+// The portion of an object that contains statically-allocated variables
+// that are declared but have not been assigned a value yet
 
 //.section .bss
 //    .lcomm times, 1     // 1 byte for local common storage
@@ -60,10 +64,14 @@ str_r9:
 @ ---------------------------------------
 .section .text
 .align 2
-
 .global debug_print
 .type debug_print, %function
+
+// r12 --> reg_val_addr
+
 debug_print:
+
+    bl saveregs
     // This function prints values of r0, r1, r2, r3 r4 and r5 to stdout.
     mov r0, $1                 // syscall
     ldr r1, =str_function_name // address of text string
@@ -81,9 +89,11 @@ r0:
     mov r7, $4            // SYS_WRITE = 4
     swi 0
 
-    mov r12, r0           // copy the raw integer value to 'auxiliary' register
-    push {r12}
+    ldr r8, =r0_save     // copy the raw 32bit value to 'aux' register
+    ldr r11, [r8]        // copy the raw integer value to 'auxiliary' register
+    mov r12, r11
     bl print_char
+
 r1:
     // print "r1 = 0x..."
     mov r0, $1            // syscall
@@ -92,9 +102,11 @@ r1:
     mov r7, $4            // SYS_WRITE = 4
     swi 0
 
-    mov r12, r1           // copy the raw integer value to 'auxiliary' register
-    push {r12}
+    ldr r8, =r1_save     // copy the raw 32bit value to 'aux' register
+    ldr r11, [r8]        // copy the raw integer value to 'auxiliary' register
+    mov r12, r11
     bl print_char
+
 r2:
     // print "r2 = 0x..."
     mov r0, $1            // syscall
@@ -103,9 +115,11 @@ r2:
     mov r7, $4            // SYS_WRITE = 4
     swi 0
 
-    mov r12, r2           // copy the raw integer value to 'auxiliary' register
-    push {r12}
+    ldr r8, =r2_save     // copy the raw 32bit value to 'aux' register
+    ldr r11, [r8]        // copy the raw integer value to 'auxiliary' register
+    mov r12, r11
     bl print_char
+
 r3:
     // print "r3 = 0x..."
     mov r0, $1            // syscall
@@ -114,8 +128,9 @@ r3:
     mov r7, $4            // SYS_WRITE = 4
     swi 0
 
-    mov r12, r3           // copy the raw integer value to 'auxiliary' register
-    push {r12}
+    ldr r8, =r3_save     // copy the raw 32bit value to 'aux' register
+    ldr r11, [r8]        // copy the raw integer value to 'auxiliary' register
+    mov r12, r11
     bl print_char
 
 r4:
@@ -126,8 +141,9 @@ r4:
     mov r7, $4            // SYS_WRITE = 4
     swi 0
 
-    mov r12, r4           // copy the raw integer value to 'auxiliary' register
-    push {r12}
+    ldr r8, =r4_save     // copy the raw 32bit value to 'aux' register
+    ldr r11, [r8]        // copy the raw integer value to 'auxiliary' register
+    mov r12, r11
     bl print_char
 
 r5:
@@ -138,8 +154,9 @@ r5:
     mov r7, $4            // SYS_WRITE = 4
     swi 0
 
-    mov r12, r5           // copy the raw integer value to 'auxiliary' register
-    push {r12}
+    ldr r8, =r5_save     // copy the raw 32bit value to 'aux' register
+    ldr r11, [r8]        // copy the raw integer value to 'auxiliary' register
+    mov r12, r11
     bl print_char
 
 r6:
@@ -150,8 +167,9 @@ r6:
     mov r7, $4            // SYS_WRITE = 4
     swi 0
 
-    mov r12, r6           // copy the raw integer value to 'auxiliary' register
-    push {r12}
+    ldr r8, =r6_save     // copy the raw 32bit value to 'aux' register
+    ldr r11, [r8]        // copy the raw integer value to 'auxiliary' register
+    mov r12, r11
     bl print_char
 
 r7:
@@ -162,8 +180,9 @@ r7:
     mov r7, $4            // SYS_WRITE = 4
     swi 0
 
-    mov r12, r7           // copy the raw integer value to 'auxiliary' register
-    push {r12}
+    ldr r8, =r7_save     // copy the raw 32bit value to 'aux' register
+    ldr r11, [r8]        // copy the raw integer value to 'auxiliary' register
+    mov r12, r11
     bl print_char
 
 r8:
@@ -174,8 +193,10 @@ r8:
     mov r7, $4            // SYS_WRITE = 4
     swi 0
 
-    mov r12, r8           // copy the raw integer value to 'auxiliary' register
-    push {r12}
+                         // r9 just here, r8 for others...
+    ldr r9, =r8_save     // copy the raw 32bit value to 'aux' register
+    ldr r11, [r9]        // copy the raw integer value to 'auxiliary' register
+    mov r12, r11
     bl print_char
 
 r9:
@@ -186,10 +207,26 @@ r9:
     mov r7, $4            // SYS_WRITE = 4
     swi 0
 
-    mov r12, r8           // copy the raw integer value to 'auxiliary' register
-    push {r12}
+    ldr r8, =r9_save     // copy the raw 32bit value to 'aux' register
+    ldr r11, [r8]        // copy the raw integer value to 'auxiliary' register
+    mov r12, r11
     bl print_char
 
-end:
-    pop {lr}
+r10:
+    // print "r10 = 0x..."
+    mov r0, $1            // syscall
+    ldr r1, =str_r10      // address of text string
+    ldr r2, =strlen_r10   // number of bytes to write
+    mov r7, $4            // SYS_WRITE = 4
+    swi 0
+
+    ldr r8, =r10_save     // copy the raw 32bit value to 'aux' register
+    ldr r11, [r8]        // copy the raw integer value to 'auxiliary' register
+    mov r12, r11
+
+    bl print_char
+
+//end:
+//    pop {lr} //  loop forever
     bx  lr
+

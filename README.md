@@ -7,10 +7,10 @@ assembly language, starting on January 2021.
 
 The program is still under construction.
 TODO:
-1. Raspberry Pi 3 GPIO mode settings.
+1. Raspberry Pi 3 GPIO mode settings' verifying.
 2. Program that reads events from certain GPIO inputs
    and calculates their amount per time frame.
 
 I'll may do the Part 2 with C (considering also asm).
 
-Arto Rasimus 2 Mar 2021
+Arto Rasimus 20 Mar 2021

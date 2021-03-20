@@ -1,5 +1,5 @@
 /* print_char.s
-Identify cpu, floating-point and syntax
+This function reads value from r12 and prints it in 8-digit hex to stdout.
 Arto Rasimus 1.3.2021 */
 .cpu cortex-a53
 .fpu neon-fp-armv8
@@ -14,7 +14,7 @@ str_function_name:
     .asciz "print_char()\n"
     strlen_function_name = .-str_function_name
 str_x:
-    .asciz "x"
+    .ascii "x"
     strlen_x = .-str_x
 /*
 str_nl:
@@ -48,10 +48,14 @@ print_char:
     mov r7, $4            // SYS_WRITE = 4
     swi 0
 */
-    pop {r12}
+//    pop {r12}
+
+// r12 --> reg_val_addr
+// r11 --> aux_reg_val_addr
+
     mov r11, $8            // counter of 8 hex digits (32 bits)
 loop:
-    ror r12, $4            // bits 31, 30, 29, 28 go to bits 3, 2, 1, 0
+    ror r12, $28            // bits 31, 30, 29, 28 go to bits 3, 2, 1, 0
     and r9, r12, 0xF       // lowest 4 bits are masked in for following comparisons
 
     mov r0, $48
@@ -119,7 +123,7 @@ loop:
     beq print_hex_digit
 
 print_hex_digit:
-    mov r9, r0
+    mov r9, r0            // hex digit to print
     ldr r10, =str_x       // just to get the address of the text string to r9
     str r9, [r10]         /* address of r9 (i.e. start of the string)
                              used for storing the ASCII char number */

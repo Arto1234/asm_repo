@@ -1,15 +1,19 @@
 clear
-as main.s -o main.o
-as read_input.s -o read_input.o
-as gpio_input.s -o gpio_input.o
-as print_char.s -o print_char.o
-as debug_print.s -o debug_print.o
+as -c main.s -o main.o
+as -c read_input.s -o read_input.o
+as -c gpio_mode_select.s -o gpio_mode_select.o
+as -c print_char.s -o print_char.o
+as -c saveregs.s -o saveregs.o
+as -c debug_print.s -o debug_print.o
+as -c gpio_mem_map_init.s -o gpio_mem_map_init.o
 ld -o main /usr/lib/arm-linux-gnueabihf/libc.so \
-  read_input.o \
-  gpio_input.o \
-  print_char.o \
-  debug_print.o \
   main.o \
--dynamic-linker /lib/ld-linux-armhf.so.3
+  read_input.o \
+  gpio_mode_select.o \
+  print_char.o \
+  saveregs.o \
+  debug_print.o \
+  gpio_mem_map_init.o \
+-dynamic-linker /lib/ld-linux-armhf.so.3 
 ./main
 
