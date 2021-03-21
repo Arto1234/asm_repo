@@ -1,6 +1,7 @@
 /* debug_print.s
-This function prints several ARMv7 registers' contents as 8-digit hex to stdout.
+This function prints several ARM registers' contents as 8 digit hex to stdout.
 Purpose is to help debugging in development phase.
+Saved variables get their values in saveregs.s.
 Arto Rasimus 20.3.2021 */
 .cpu cortex-a53
 .fpu neon-fp-armv8
@@ -11,7 +12,6 @@ Arto Rasimus 20.3.2021 */
 @       Data Section
 @ ---------------------------------------
 .section .data
-
 
 str_function_name:
     .asciz "\n\ndebug_print()\n"
@@ -56,9 +56,6 @@ str_r10:
 // The portion of an object that contains statically-allocated variables
 // that are declared but have not been assigned a value yet
 
-//.section .bss
-//    .lcomm times, 1     // 1 byte for local common storage
-
 @ ---------------------------------------
 @       Code Section
 @ ---------------------------------------
@@ -66,8 +63,6 @@ str_r10:
 .align 2
 .global debug_print
 .type debug_print, %function
-
-// r12 --> reg_val_addr
 
 debug_print:
 
@@ -78,8 +73,6 @@ debug_print:
     ldr r2, =strlen_function_name // number of bytes to write
     mov r7, $4                // SYS_WRITE = 4
     swi 0
-
-    push {lr}
 
 r0:
     // print "r0 = 0x..."
@@ -226,7 +219,12 @@ r10:
 
     bl print_char
 
-//end:
-//    pop {lr} //  loop forever
-    bx  lr
+end:
+    mov r0, $1                 // syscall
+    ldr r1, =str_function_name // address of text string
+    ldr r2, =strlen_function_name // number of bytes to write
+    mov r7, $4                // SYS_WRITE = 4
+    swi 0
 
+//    pop {lr} //  loop forever
+    bx lr
