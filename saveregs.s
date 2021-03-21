@@ -81,37 +81,71 @@ aux_reg_val:
 .global saveregs
 .type saveregs, %function
 saveregs:
+    // General purpose
     ldr r10, =r0_save        // Load address for the global variable to some reg (r10)
     str r0, [r10]            // Save r0 to global variable
 
+    // General purpose
     ldr r10, =r1_save        // Load address for the global variable to some reg (r10)
     str r1, [r10]            // Save r1 to global variable
 
+    // General purpose
     ldr r10, =r2_save        // Load address for the global variable to some reg (r10)
     str r2, [r10]            // Save r2 to global variable
 
+    // General purpose
     ldr r10, =r3_save        // Load address for the global variable to some reg (r10)
     str r3, [r10]            // Save r3 to global variable
 
+    // General purpose
     ldr r10, =r4_save        // Load address for the global variable to some reg (r10)
     str r4, [r10]            // Save r4 to global variable
 
+    // General purpose
     ldr r10, =r5_save        // Load address for the global variable to some reg (r10)
     str r5, [r10]            // Save r5 to global variable
 
+    // General purpose
     ldr r10, =r6_save        // Load address for the global variable to some reg (r10)
     str r6, [r10]            // Save r6 to global variable
 
+    // Syscall Number
     ldr r10, =r7_save        // Load address for the global variable to some reg (r10)
     str r7, [r10]            // Save r7 to global variable
 
+    // General purpose
     ldr r10, =r8_save        // Load address for the global variable to some reg (r10)
     str r8, [r10]            // Save r8 to global variable
 
+    // General purpose
     ldr r10, =r9_save        // Load address for the global variable to some reg (r10)
     str r9, [r10]            // Save r9 to global variable
 
+    // General purpose
     ldr r9, =r10_save        // Load address for the global variable to some reg (r9)
     str r10, [r9]            // Save r10 to global variable
+
+    // FP Frame Pointer
+    ldr r10, =r11_save        // Load address for the global variable to some reg (r10)
+    str r11, [r10]            // Save r11 to global variable
+
+    // Special purpose registers
+    // IP Intra Procedural Call
+    ldr r10, =r12_save        // Load address for the global variable to some reg (r10)
+    str r12, [r10]            // Save r12 to global variable
+
+    // SP Stack Pointer
+    ldr r10, =r13_save        // Load address for the global variable to some reg (r10)
+    str r13, [r10]            // Save r13 to global variable
+
+    // LR Link Register
+    ldr r10, =r14_save        // Load address for the global variable to some reg (r10)
+    str r14, [r10]            // Save r14 to global variable
+
+    // PC Program Counter
+    ldr r10, =r15_save        // Load address for the global variable to some reg (r10)
+    str r15, [r10]            // Save r15 to global variable
+
+    // CPSR
 
     bx lr
