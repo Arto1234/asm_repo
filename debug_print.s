@@ -17,38 +17,53 @@ str_function_name:
     .asciz "\n\ndebug_print()\n"
     strlen_function_name = .-str_function_name
 str_r0:
-    .ascii "r0  = 0x"
+    .ascii "GP r0  = 0x"
     strlen_r0 = .-str_r0
 str_r1:
-    .ascii "r1  = 0x"
+    .ascii "GP r1  = 0x"
     strlen_r1 = .-str_r1
 str_r2:
-    .ascii "r2  = 0x"
+    .ascii "GP r2  = 0x"
     strlen_r2 = .-str_r2
 str_r3:
-    .ascii "r3  = 0x"
+    .ascii "GP r3  = 0x"
     strlen_r3 = .-str_r3
 str_r4:
-    .ascii "r4  = 0x"
+    .ascii "GP r4  = 0x"
     strlen_r4 = .-str_r4
 str_r5:
-    .ascii "r5  = 0x"
+    .ascii "GP r5  = 0x"
     strlen_r5 = .-str_r5
 str_r6:
-    .ascii "r6  = 0x"
+    .ascii "GP r6  = 0x"
     strlen_r6 = .-str_r6
 str_r7:
-    .ascii "r7  = 0x"
+    .ascii "SY r7  = 0x"
     strlen_r7 = .-str_r7
 str_r8:
-    .ascii "r8  = 0x"
+    .ascii "GP r8  = 0x"
     strlen_r8 = .-str_r8
 str_r9:
-    .ascii "r9  = 0x"
+    .ascii "GP r9  = 0x"
     strlen_r9 = .-str_r9
 str_r10:
-    .ascii "r10 = 0x"
+    .ascii "GP r10 = 0x"
     strlen_r10 = .-str_r10
+str_r11:
+    .ascii "FP r11 = 0x"
+    strlen_r11 = .-str_r11
+str_r12:
+    .ascii "IP r12 = 0x"
+    strlen_r12 = .-str_r12
+str_r13:
+    .ascii "SP r13 = 0x"
+    strlen_r13 = .-str_r13
+str_r14:
+    .ascii "LR r14 = 0x"
+    strlen_r14 = .-str_r14
+str_r15:
+    .ascii "PC r15 = 0x"
+    strlen_r15 = .-str_r15
 
 @ ---------------------------------------
 @       Block Starting Symbol Section
@@ -65,6 +80,7 @@ str_r10:
 .type debug_print, %function
 
 debug_print:
+    push {lr}
 
     bl saveregs
     // This function prints values of r0, r1, r2, r3 r4 and r5 to stdout.
@@ -203,6 +219,7 @@ r9:
     ldr r8, =r9_save     // copy the raw 32bit value to 'aux' register
     ldr r11, [r8]        // copy the raw integer value to 'auxiliary' register
     mov r12, r11
+
     bl print_char
 
 r10:
@@ -219,6 +236,76 @@ r10:
 
     bl print_char
 
+r11:
+    // print "r11 = 0x..."
+    mov r0, $1            // syscall
+    ldr r1, =str_r11      // address of text string
+    ldr r2, =strlen_r11   // number of bytes to write
+    mov r7, $4            // SYS_WRITE = 4
+    swi 0
+
+    ldr r8, =r11_save     // copy the raw 32bit value to 'aux' register
+    ldr r10, [r8]        // copy the raw integer value to 'auxiliary' register
+    mov r12, r10
+
+    bl print_char
+
+r12:
+    // print "r12 = 0x..."
+    mov r0, $1            // syscall
+    ldr r1, =str_r12      // address of text string
+    ldr r2, =strlen_r12   // number of bytes to write
+    mov r7, $4            // SYS_WRITE = 4
+    swi 0
+
+    ldr r8, =r12_save     // copy the raw 32bit value to 'aux' register
+    ldr r11, [r8]        // copy the raw integer value to 'auxiliary' register
+    mov r12, r11
+
+    bl print_char
+
+r13:
+    // print "r13 = 0x..."
+    mov r0, $1            // syscall
+    ldr r1, =str_r13      // address of text string
+    ldr r2, =strlen_r13   // number of bytes to write
+    mov r7, $4            // SYS_WRITE = 4
+    swi 0
+
+    ldr r8, =r13_save     // copy the raw 32bit value to 'aux' register
+    ldr r11, [r8]        // copy the raw integer value to 'auxiliary' register
+    mov r12, r11
+
+    bl print_char
+
+r14:
+    // print "r14 = 0x..."
+    mov r0, $1            // syscall
+    ldr r1, =str_r14      // address of text string
+    ldr r2, =strlen_r14   // number of bytes to write
+    mov r7, $4            // SYS_WRITE = 4
+    swi 0
+
+    ldr r8, =r14_save     // copy the raw 32bit value to 'aux' register
+    ldr r11, [r8]        // copy the raw integer value to 'auxiliary' register
+    mov r12, r11
+
+    bl print_char
+
+r15:
+    // print "r15 = 0x..."
+    mov r0, $1            // syscall
+    ldr r1, =str_r15      // address of text string
+    ldr r2, =strlen_r15   // number of bytes to write
+    mov r7, $4            // SYS_WRITE = 4
+    swi 0
+
+    ldr r8, =r15_save     // copy the raw 32bit value to 'aux' register
+    ldr r11, [r8]        // copy the raw integer value to 'auxiliary' register
+    mov r12, r11
+
+    bl print_char
+
 end:
     mov r0, $1                 // syscall
     ldr r1, =str_function_name // address of text string
@@ -226,5 +313,5 @@ end:
     mov r7, $4                // SYS_WRITE = 4
     swi 0
 
-//    pop {lr} //  loop forever
-    bx lr
+//    bx lr // loop. ilman tätä: bus error
+    pop {pc}
