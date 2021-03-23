@@ -126,13 +126,14 @@ funct:
 .global gpio_input
 .type gpio_input, %function
 gpio_input:
+    push {lr}
+
     mov r0, $1                    // syscall
     ldr r1, =str_function_name    // address of text string
     ldr r2, =strlen_function_name // number of bytes to write
     mov r7, $4                    // SYS_WRITE = 4
     swi 0
 
-    push     {lr}
 //    b print_msg_input
 
 begin:
@@ -362,9 +363,9 @@ gpfclr1:
 print_msg_input:
 //    b begin
 
-//end:
-    pop {lr}
-    bx  lr
+end:
+    pop {pc}
+//    bx  lr
 /*
 GPFSEL0 pins 0-9
 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00
