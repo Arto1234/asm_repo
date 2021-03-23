@@ -42,7 +42,8 @@ _start:
     bl gpio_mem_init  // returns kernel mapped addr in r0
 
     bl debug_print
-    bl gpio_input
+    bl gpio_input   // seg fault
+
 
 /*
 loop:
@@ -76,5 +77,4 @@ end:
     mov r0, $0        // exit with 0 exit code
     mov r7, $1        // SYS_EXIT
     swi 0             // SW interrupt
-
 
