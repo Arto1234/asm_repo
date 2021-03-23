@@ -17,7 +17,7 @@ str_function_name:
     strlen_function_name = .-str_function_name
 
 // Initialised with some values.
-r0_save:  .word 0x87654321
+r0_save:  .word 0x12345678
 r1_save:  .word 0x10001
 r2_save:  .word 0x20002
 r3_save:  .word 0x30003
