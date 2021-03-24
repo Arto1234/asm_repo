@@ -9,9 +9,7 @@ The program is still under construction.
 TODO:
 1. GPIO mode parameters' reading from file instead of stdin.
 2. Raspberry Pi 3 GPIO mode settings' verifying.
-.
-.
-.
+
 X. Program that reads events from certain GPIO inputs
    and calculates their amount per time frame.
 
