@@ -46,11 +46,11 @@ that are declared but have not been assigned a value yet. */
 check_hex_digit:
     push {lr}
 
-    mov r0, $1                    // syscall
-    ldr r1, =str_function_name    // address of text string
-    ldr r2, =strlen_function_name // number of bytes to write
-    mov r7, $4                    // SYS_WRITE = 4
-    swi 0
+//    mov r0, $1                    // syscall
+//    ldr r1, =str_function_name    // address of text string
+//    ldr r2, =strlen_function_name // number of bytes to write
+//    mov r7, $4                    // SYS_WRITE = 4
+//    swi 0
 
 
     mov r3, $0
