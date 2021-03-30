@@ -99,29 +99,29 @@ funct:
 @ The portion of an object that contains statically-allocated variables
 @ that are declared but have not been assigned a value yet
 
-.section .bss
-    .lcomm gpfsel0_offset,  0x00 // pins  0.. 9 function selection
-    .lcomm gpfsel1_offset,  0x04 // pins 10..19 function selection
-    .lcomm gpfsel2_offset,  0x08 // pins 20..29 function selection
-    .lcomm gpfsel3_offset,  0x0C // pins 30..39 function selection
-    .lcomm gpfsel4_offset,  0x10 // pins 40..49 function selection
-    .lcomm gpfsel5_offset,  0x14 // pins 50..53 function selection
-
-    .lcomm gpfset0_offset,  0x1C // pins  0..31 output set 0
-    .lcomm gpfset1_offset,  0x20 // pins 32..53 output set 1
-
-    .lcomm gpfclr0_offset,  0x28 // pins  0..31 output clear 0
-    .lcomm gpfclr1_offset,  0x2C // pins 32..53 output clear 1
-
-    .lcomm gpflev0_offset,  0x34 // pins  0..31 level 0
-    .lcomm gpflev1_offset,  0x38 // pins 32..53 level 1
-
+//.section .bss
 
 @ ---------------------------------------
 @	Code Section
 @ ---------------------------------------
 .section .text
 .align 2
+
+    GPFSEL0_OFFSET .equ 0x00 // pins  0.. 9 function selection
+    GPFSEL1_OFFSET .equ 0x04 // pins 10..19 function selection
+    GPFSEL2_OFFSET .equ 0x08 // pins 20..29 function selection
+    GPFSEL3_OFFSET .equ 0x0C // pins 30..39 function selection
+    GPFSEL4_OFFSET .equ 0x10 // pins 40..49 function selection
+    GPFSEL5_OFFSET .equ 0x14 // pins 50..53 function selection
+
+    GPFSET0_OFFSET .equ 0x1C // pins  0..31 output set 0
+    GPFSET1_OFFSET .equ 0x20 // pins 32..53 output set 1
+
+    GPFCLR0_OFFSET .equ 0x28 // pins  0..31 output clear 0
+    GPFCLR1_OFFSET .equ 0x2C // pins 32..53 output clear 1
+
+    GPFLEV0_OFFSET .equ 0x34 // pins  0..31 level 0
+    GPFLEV1_OFFSET .equ 0x38 // pins 32..53 level 1
 
 .global gpio_input
 .type gpio_input, %function
@@ -162,15 +162,15 @@ function_selection:
     .equ GPLEV0,    0x00000034 // pins  0..31 level 0
     .equ GPLEV1,    0x00000038 // pins 32..53 level 1
 
-    .equ GPEDS0,    0x00000040 
-    .equ GPEDS1,    0x00000044 
+    .equ GPEDS0,    0x00000040
+    .equ GPEDS1,    0x00000044
 
-    .equ GPHEN0,    0x00000064 
-    .equ GPHEN1,    0x00000068 
+    .equ GPHEN0,    0x00000064
+    .equ GPHEN1,    0x00000068
 
-    .equ GPPUD,     0x00000094 
-    .equ GPPUDCLK0, 0x00000098 
-    .equ GPPUDCLK1, 0x0000009C 
+    .equ GPPUD,     0x00000094
+    .equ GPPUDCLK0, 0x00000098
+    .equ GPPUDCLK1, 0x0000009C
 
 
 ldr r3, =$0x00000201 // just testing
