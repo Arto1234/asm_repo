@@ -1,11 +1,11 @@
-/* hex_hex_digit.s
-In:  ASCII, r12
-Out: hex conversion, r3
-Out: status: r12
-This function reads ASCII value from r12 and checks it (valid hex or not).
-Value as integer returned in r3.
-Conversion OK, status 0 in r12
-Conversion not valid: status 999 in r12.
+/* check_hex_digit.s
+This function reads ASCII value from r10 and checks it (valid hex or not).
+In:  ASCII, r10 ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                 'A', 'B', 'C', 'D', 'E', 'F', 'a', 'b', 'c', 'd', 'e', 'f'
+Out: hex conversion, r3 (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+Out: status: r10
+Conversion OK, status 0 in r10
+Conversion not valid: status 999 in r10
 Arto Rasimus 30.3.2021 */
 .cpu cortex-a53
 .fpu neon-fp-armv8
@@ -19,6 +19,14 @@ Arto Rasimus 30.3.2021 */
 str_function_name:
     .asciz "check_hex_digit()\n"
     strlen_function_name = .-str_function_name
+
+msg_err_wrong_value:
+    .asciz "Wrong value\n"
+    strlen_msg_err_wrong_value = .-msg_err_wrong_value
+
+msg_value_ok:
+    .asciz "Value ok\n"
+    strlen_msg_value_ok = .-msg_value_ok
 
 /* ---------------------------------------
         Block Starting Symbol Section
@@ -36,108 +44,125 @@ that are declared but have not been assigned a value yet. */
 .global check_hex_digit
 .type check_hex_digit, %function
 check_hex_digit:
+    push {lr}
+
+    mov r0, $1                    // syscall
+    ldr r1, =str_function_name    // address of text string
+    ldr r2, =strlen_function_name // number of bytes to write
+    mov r7, $4                    // SYS_WRITE = 4
+    swi 0
+
+
     mov r3, $0
-    cmp r12, $48         // is == '0'?
+    cmp r10, $48         // is == '0'?
     beq value_ok
 
     mov r3, $1
-    cmp r12, $49         // is == '1'?
+    cmp r10, $49         // is == '1'?
     beq value_ok
 
     mov r3, $2
-    cmp r12, $50         // is == '2'?
+    cmp r10, $50         // is == '2'?
     beq value_ok
 
     mov r3, $3
-    cmp r12, $51         // is == '3'?
+    cmp r10, $51         // is == '3'?
     beq value_ok
 
     mov r3, $4
-    cmp r12, $52         // is == '4'?
+    cmp r10, $52         // is == '4'?
     beq value_ok
 
     mov r3, $5
-    cmp r12, $53         // is == '5'?
+    cmp r10, $53         // is == '5'?
     beq value_ok
 
     mov r3, $6
-    cmp r12, $54         // is == '6'?
+    cmp r10, $54         // is == '6'?
     beq value_ok
 
     mov r3, $7
-    cmp r12, $55         // is == '7'?
+    cmp r10, $55         // is == '7'?
     beq value_ok
 
     mov r3, $8
-    cmp r12, $56         // is == '8'?
+    cmp r10, $56         // is == '8'?
     beq value_ok
 
     mov r3, $9
-    cmp r12, $57         // is == '9'?
+    cmp r10, $57         // is == '9'?
     beq value_ok
 
     mov r3, $10
-    cmp r12, $65         // is == 'A'?
+    cmp r10, $65         // is == 'A'?
     beq value_ok
 
     mov r3, $11
-    cmp r12, $66         // is == 'B'?
+    cmp r10, $66         // is == 'B'?
     beq value_ok
 
     mov r3, $12
-    cmp r12, $67         // is == 'C'?
+    cmp r10, $67         // is == 'C'?
     beq value_ok
 
     mov r3, $13
-    cmp r12, $68         // is == 'D'?
+    cmp r10, $68         // is == 'D'?
     beq value_ok
 
     mov r3, $14
-    cmp r12, $69         // is == 'E'?
+    cmp r10, $69         // is == 'E'?
     beq value_ok
 
     mov r3, $15
-    cmp r12, $70         // is == 'F'?
+    cmp r10, $70         // is == 'F'?
     beq value_ok
 
     mov r3, $10
-    cmp r12, $97         // is == 'a'?
+    cmp r10, $97         // is == 'a'?
     beq value_ok
 
     mov r3, $11
-    cmp r12, $98         // is == 'b'?
+    cmp r10, $98         // is == 'b'?
     beq value_ok
 
     mov r3, $12
-    cmp r12, $99         // is == 'c'?
+    cmp r10, $99         // is == 'c'?
     beq value_ok
 
     mov r3, $13
-    cmp r12, $100        // is == 'd'?
+    cmp r10, $100        // is == 'd'?
     beq value_ok
 
     mov r3, $14
-    cmp r12, $101        // is == 'e'?
+    cmp r10, $101        // is == 'e'?
     beq value_ok
 
     mov r3, $15
-    cmp r12, $102        // is == 'f'?
+    cmp r10, $102        // is == 'f'?
     beq value_ok
 
     b out_of_limits
 
 value_ok:
-    mov r12, $0
+    mov r10, $0
+
+    mov r0, $1                      // syscall
+    ldr r1, =msg_value_ok           // address of text string
+    ldr r2, =strlen_msg_value_ok    // number of bytes to write
+    mov r7, $4                      // SYS_WRITE = 4
+    swi 0
+
     b end
 
 out_of_limits:
-    mov r0, $1        // syscall
-    ldr r1, =msg_err_wrong_input // address of text string
-    ldr r2, =strlen_msg_err_wrong_input  // number of bytes to write
-    mov r7, $4          // SYS_WRITE = 4
+    mov r10, $999  // invalid character (not hex)
+
+    mov r0, $1                      // syscall
+    ldr r1, =msg_err_wrong_value    // address of text string
+    ldr r2, =strlen_msg_err_wrong_value // number of bytes to write
+    mov r7, $4                      // SYS_WRITE = 4
     swi 0
 
-    mov r12, $999  // invalid character (not hex)
     b end
 
 end:
