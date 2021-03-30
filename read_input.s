@@ -1,45 +1,53 @@
 /* read_input.s
-This function reads one character from stdin and accepts values 0..9.
+This function reads one 32-bit value (8 hex characters) from stdin.
+Digits must be in hex. Value range: 00000000..FFFFFFFF.
 It reads input and returns it to _start.
-Value is returned in r3 as plain 1-byte digit.
-'0' (ASCII 48) returned as 0
-'1' (ASCII 49) returned as 1
-'2' (ASCII 50) returned as 2
-'3' (ASCII 51) returned as 3
-'4' (ASCII 52) returned as 4
-'5' (ASCII 53) returned as 5
-'6' (ASCII 54) returned as 6
-'7' (ASCII 55) returned as 7
-'8' (ASCII 56) returned as 8
-'9' (ASCII 57) returned as 9
+Value is returned in r3 as 32-bit hex value.
+
 TODO: better input handling. Now is read only one char.
+TODO: reading from parameter file.
 Later could be read until <enter>.
-Arto Rasimus 1.3.2021 */
+Program is meant to be run in Raspberry Pi 3 and compatible.
+Arto Rasimus 24.3.2021 */
 .cpu cortex-a53
 .fpu neon-fp-armv8
 .syntax unified
 .section .rodata
 .align 2
-@ ---------------------------------------
-@	Data Section
-@ ---------------------------------------
+/* ---------------------------------------
+        Data Section
+ ---------------------------------------*/
 .section .data
 message:
-        .asciz "Give number (0 = quit): "
-        strlen = .-message
+    .asciz "Give number (0 = quit): "
+    strlen = .-message
 
 msg_err_wrong_input:
-        .asciz "Wrong input\n"
-        strlen_msg_err_wrong_input = .-msg_err_wrong_input
+    .asciz "Wrong input\n"
+    strlen_msg_err_wrong_input = .-msg_err_wrong_input
 
-@ ---------------------------------------
-@       Block Starting Symbol Section
-@ ---------------------------------------
-@ The portion of an object that contains statically-allocated variables
-@ that are declared but have not been assigned a value yet
+msg_err_wrong_length:
+    .asciz "Wrong parameter length\n"
+    strlen_msg_err_wrong_length = .-msg_err_wrong_length
+
+/* ---------------------------------------
+        Block Starting Symbol Section
+ ---------------------------------------
+ The portion of an object that contains statically-allocated variables
+ that are declared but have not been assigned a value yet */
 
 .section .bss
-    .lcomm times, 1     // 2 bytes for local common storage
+    // local common storage
+    .lcomm hex_value, 4
+
+    .lcomm input_digit_0_hex, 1
+    .lcomm input_digit_1_hex, 1
+    .lcomm input_digit_2_hex, 1
+    .lcomm input_digit_3_hex, 1
+    .lcomm input_digit_4_hex, 1
+    .lcomm input_digit_5_hex, 1
+    .lcomm input_digit_6_hex, 1
+    .lcomm input_digit_7_hex, 1
 
 @ ---------------------------------------
 @	Code Section
@@ -50,8 +58,8 @@ msg_err_wrong_input:
 .global read_input
 read_input:
 .type read_input, %function
-
 begin_function:
+    push {lr}
     // print question string
     mov r0, $1         // syscall
     ldr r1, =message   // address of text string
@@ -60,26 +68,90 @@ begin_function:
     swi 0
 
     mov r0, $0         // syscall: SYS_READ
-    ldr r1, =times     // Load our reserved 3 bytes for the buffer into r4
-    mov r2, $1         // Set max input size to 1 byte: char
+    ldr r1, =hex_value //
+    mov r2, $8         // Set max input size to 8 bytes: 8 chars
     mov r7, $3         // Load syscall SYS_READ (3) into r7
     swi $0             // Invoke the system call
 
-    ldr r3, [r1]       // save reference of character to r3
-    and r3, r3, $0x0FF // the enter is masked off
+    mov r9, r1
+/* TODO: if value is shorter that 8 digits, then zero padding must be done
+         into MSB bits. */
 
-begin_if:
-    // check input: 0 - 9
-    cmp r3, $48         // is < '0'
-    blt out_of_limits
+// TODO: check string actual length !!!
+    cmp r2, $8
+    bne wrong_parameter_length
 
-    cmp r3, $57         // is > '9'
-    bgt out_of_limits
+    ldrb r10, [r9], $1
+    bl check_hex_digit
+
+    ldrb r10, [r9], $1
+    bl check_hex_digit
+
+    ldrb r10, [r9], $1
+    bl check_hex_digit
+
+    ldrb r10, [r9], $1
+    bl check_hex_digit
+
+    ldrb r10, [r9], $1
+    bl check_hex_digit
+
+    ldrb r10, [r9], $1
+    bl check_hex_digit
+
+    ldrb r10, [r9], $1
+    bl check_hex_digit
+
+    ldrb r10, [r9], $1
+    bl check_hex_digit
+
+
+loop:
+// lue merkki
+// maskaa 0xFF:n kanssa
+// vertaa, että 48-57 (0..9) tai 65-70 (A..F) tai 97-102 (a..f)
+// siirrä nibble oikeaan kohtaan: alkaen paikasta 7
+// looppaa paikkaan 0
+// paluuarvo 32-bit, 8 hex digit arvo on valmis!
+//    ldr r0, [r1]//, r6]      // save reference of character to r0
+
+//    ror r0, $16           // bits 31, 30, 29, 28 go to bits 3, 2, 1, 0
+//    ror r0, $16           // bits 31, 30, 29, 28 go to bits 3, 2, 1, 0
+
+    // ASCII code is stored in lowest nibble in r1 in hex
+
+
 
 value_ok:
-    sub r3, $48         // value is valid. Convert ASCII to number
+    /* hex digit is left-shifted to correct place
+    with the amount of (r2) counter (in nibbles)
+    r2 = 28, 24, 20, 16, 12, 8, 4, 0 */
+
+//    mov r6, $4
+//    mul r5, r2, r6
+//    lsl r3, r3, r5 // hex digit shifted to left to correct place
+    bl debug_print
+
+    add r6, r6, $1  // hex_value loop counter for reading the string
+    add r1, r1, $1
+
+    subs r2, $1
+    cmp r6, $3
+//    blt loop   // counter > 0, continue looping
+
     b end
 
+// parameter length <> 8 chars
+wrong_parameter_length:
+    mov r0, $1        // syscall
+    ldr r1, =msg_err_wrong_length // address of text string
+    ldr r2, =strlen_msg_err_wrong_length  // number of bytes to write
+    mov r7, $4          // SYS_WRITE = 4
+    swi 0
+
+    b end
+
+// invalid character
 out_of_limits:
     mov r0, $1        // syscall
     ldr r1, =msg_err_wrong_input // address of text string
@@ -87,7 +159,7 @@ out_of_limits:
     mov r7, $4          // SYS_WRITE = 4
     swi 0
 
-    b begin_function    // invalid character
+    b end
 
 end:
-    bx  lr
+    pop {pc}
