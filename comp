@@ -4,6 +4,7 @@ as -c read_input.s -o read_input.o
 as -c gpio_mode_select.s -o gpio_mode_select.o
 as -c print_char.s -o print_char.o
 as -c saveregs.s -o saveregs.o
+as -c check_hex_digit.s -o check_hex_digit.o
 as -c debug_print.s -o debug_print.o
 as -c gpio_mem_map_init.s -o gpio_mem_map_init.o
 ld -o main /usr/lib/arm-linux-gnueabihf/libc.so \
@@ -12,6 +13,7 @@ ld -o main /usr/lib/arm-linux-gnueabihf/libc.so \
   gpio_mode_select.o \
   print_char.o \
   saveregs.o \
+  check_hex_digit.o \
   debug_print.o \
   gpio_mem_map_init.o \
 -dynamic-linker /lib/ld-linux-armhf.so.3 
