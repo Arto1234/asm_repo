@@ -84,7 +84,7 @@ debug_print:
     push {lr}
 
     bl saveregs
-    // This function prints values of r0, r1, r2, r3 r4 and r5 to stdout.
+    // This function prints values of registers r0..r15 to stdout.
     mov r0, $1                 // syscall
     ldr r1, =str_function_name // address of text string
     ldr r2, =strlen_function_name // number of bytes to write
@@ -92,7 +92,7 @@ debug_print:
     swi 0
 
 r0:
-    // print "r0 = 0x..."
+    // print "GP r0 = 0x..."
     mov r0, $1            // syscall
     ldr r1, =str_r0       // address of text string
     ldr r2, =strlen_r0    // number of bytes to write
@@ -105,7 +105,7 @@ r0:
     bl print_char
 
 r1:
-    // print "r1 = 0x..."
+    // print "GP r1 = 0x..."
     mov r0, $1            // syscall
     ldr r1, =str_r1       // address of text string
     ldr r2, =strlen_r1    // number of bytes to write
@@ -118,7 +118,7 @@ r1:
     bl print_char
 
 r2:
-    // print "r2 = 0x..."
+    // print "GP r2 = 0x..."
     mov r0, $1            // syscall
     ldr r1, =str_r2       // address of text string
     ldr r2, =strlen_r2    // number of bytes to write
@@ -131,7 +131,7 @@ r2:
     bl print_char
 
 r3:
-    // print "r3 = 0x..."
+    // print "GP r3 = 0x..."
     mov r0, $1            // syscall
     ldr r1, =str_r3       // address of text string
     ldr r2, =strlen_r3    // number of bytes to write
@@ -144,7 +144,7 @@ r3:
     bl print_char
 
 r4:
-    // print "r4 = 0x..."
+    // print "GP r4 = 0x..."
     mov r0, $1            // syscall
     ldr r1, =str_r4       // address of text string
     ldr r2, =strlen_r4    // number of bytes to write
@@ -157,7 +157,7 @@ r4:
     bl print_char
 
 r5:
-    // print "r5 = 0x..."
+    // print "GP r5 = 0x..."
     mov r0, $1            // syscall
     ldr r1, =str_r5       // address of text string
     ldr r2, =strlen_r5    // number of bytes to write
@@ -170,7 +170,7 @@ r5:
     bl print_char
 
 r6:
-    // print "r6 = 0x..."
+    // print "GP r6 = 0x..."
     mov r0, $1            // syscall
     ldr r1, =str_r6       // address of text string
     ldr r2, =strlen_r6    // number of bytes to write
@@ -183,7 +183,7 @@ r6:
     bl print_char
 
 r7:
-    // print "r7 = 0x..."
+    // print "SY r7 = 0x..."
     mov r0, $1            // syscall
     ldr r1, =str_r7       // address of text string
     ldr r2, =strlen_r7    // number of bytes to write
@@ -196,7 +196,7 @@ r7:
     bl print_char
 
 r8:
-    // print "r8 = 0x..."
+    // print "GP r8 = 0x..."
     mov r0, $1            // syscall
     ldr r1, =str_r8       // address of text string
     ldr r2, =strlen_r8    // number of bytes to write
@@ -210,7 +210,7 @@ r8:
     bl print_char
 
 r9:
-    // print "r9 = 0x..."
+    // print "GP r9 = 0x..."
     mov r0, $1            // syscall
     ldr r1, =str_r9       // address of text string
     ldr r2, =strlen_r9    // number of bytes to write
@@ -224,7 +224,7 @@ r9:
     bl print_char
 
 r10:
-    // print "r10 = 0x..."
+    // print "GP r10 = 0x..."
     mov r0, $1            // syscall
     ldr r1, =str_r10      // address of text string
     ldr r2, =strlen_r10   // number of bytes to write
@@ -238,7 +238,7 @@ r10:
     bl print_char
 
 r11:
-    // print "r11 = 0x..."
+    // print "FP r11 = 0x..."
     mov r0, $1            // syscall
     ldr r1, =str_r11      // address of text string
     ldr r2, =strlen_r11   // number of bytes to write
@@ -252,7 +252,7 @@ r11:
     bl print_char
 
 r12:
-    // print "r12 = 0x..."
+    // print "IP r12 = 0x..."
     mov r0, $1            // syscall
     ldr r1, =str_r12      // address of text string
     ldr r2, =strlen_r12   // number of bytes to write
@@ -266,7 +266,7 @@ r12:
     bl print_char
 
 r13:
-    // print "r13 = 0x..."
+    // print "SP r13 = 0x..."
     mov r0, $1            // syscall
     ldr r1, =str_r13      // address of text string
     ldr r2, =strlen_r13   // number of bytes to write
@@ -280,7 +280,7 @@ r13:
     bl print_char
 
 r14:
-    // print "r14 = 0x..."
+    // print "LR r14 = 0x..."
     mov r0, $1            // syscall
     ldr r1, =str_r14      // address of text string
     ldr r2, =strlen_r14   // number of bytes to write
@@ -294,7 +294,7 @@ r14:
     bl print_char
 
 r15:
-    // print "r15 = 0x..."
+    // print "PC r15 = 0x..."
     mov r0, $1            // syscall
     ldr r1, =str_r15      // address of text string
     ldr r2, =strlen_r15   // number of bytes to write
