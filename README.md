@@ -12,7 +12,7 @@ Purpose 2: To create a way to make GPIO modeset configurations for Raspberry Pi,
 TODO:
 1. GPIO mode parameters' reading in a parametrised way. Now functions basically from stdin.
 2. Raspberry Pi 3 GPIO mode settings' verifying.
-X. Program that reads events from certain GPIO inputs and calculates their amount per time frame.
+3. Program that reads events from certain GPIO inputs and calculates their amount per time frame.
 
 I'll may do the Part X with C (considering also asm).
 
