@@ -41,6 +41,10 @@ that are declared but have not been assigned a value yet. */
 .section .text
 .align 2
 
+.equ SYS_WRITE_C,  0x4
+.equ STATUS_OK_C,  0x71 // Return value OK
+.equ STATUS_NOK_C, 0x82 // Return value NOK
+
 .global check_hex_digit
 .type check_hex_digit, %function
 check_hex_digit:
@@ -141,18 +145,18 @@ check_hex_digit:
     cmp r10, $102        // is == 'f'?
     beq value_ok
 
-    b out_of_limits
+//    b out_of_limits
 
 value_ok:
     mov r10, $0
-
+/*
     mov r0, $1                      // syscall
     ldr r1, =msg_value_ok           // address of text string
     ldr r2, =strlen_msg_value_ok    // number of bytes to write
-    mov r7, $4                      // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
-
-    mov r10, $0x71                  // hex conversion OK
+*/
+    mov r10, STATUS_OK_C            // hex conversion OK
 
     b end
 
@@ -160,10 +164,10 @@ out_of_limits:
     mov r0, $1                      // syscall
     ldr r1, =msg_err_wrong_value    // address of text string
     ldr r2, =strlen_msg_err_wrong_value // number of bytes to write
-    mov r7, $4                      // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
-    mov r10, $0x82                  // failed. invalid character (not hex)
+    mov r10, STATUS_NOK_C           // failed. invalid character (not hex)
 
     b end
 
