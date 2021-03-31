@@ -36,18 +36,9 @@ msg_err_wrong_length:
  The portion of an object that contains statically-allocated variables
  that are declared but have not been assigned a value yet */
 
+// local common storage
 .section .bss
-    // local common storage
     .lcomm hex_value, 4
-
-    .lcomm input_digit_0_hex, 1
-    .lcomm input_digit_1_hex, 1
-    .lcomm input_digit_2_hex, 1
-    .lcomm input_digit_3_hex, 1
-    .lcomm input_digit_4_hex, 1
-    .lcomm input_digit_5_hex, 1
-    .lcomm input_digit_6_hex, 1
-    .lcomm input_digit_7_hex, 1
 
 @ ---------------------------------------
 @	Code Section
@@ -76,35 +67,66 @@ begin_function:
     mov r9, r1
 /* TODO: if value is shorter that 8 digits, then zero padding must be done
          into MSB bits. */
-
+    mov r5, $0
 // TODO: check string actual length !!!
     cmp r2, $8
     bne wrong_parameter_length
 
     ldrb r10, [r9], $1
-    bl check_hex_digit
+    bl check_hex_digit // ret val: r3 int. status: r10 0=ok, 999=nok
+    cmp r10, $0x71
+    bne out_of_limits
+    lsl r4, r3, $28
+    orr r5, r4
 
     ldrb r10, [r9], $1
-    bl check_hex_digit
+    bl check_hex_digit // ret val: r3 int. status: r10 0=ok, 999=nok
+    cmp r10, $0x71
+    bne out_of_limits
+    lsl r4, r3, $24
+    orr r5, r4
 
     ldrb r10, [r9], $1
-    bl check_hex_digit
+    bl check_hex_digit // ret val: r3 int. status: r10 0=ok, 999=nok
+    cmp r10, $0x71
+    bne out_of_limits
+    lsl r4, r3, $20
+    orr r5, r4
 
     ldrb r10, [r9], $1
-    bl check_hex_digit
+    bl check_hex_digit // ret val: r3 int. status: r10 0=ok, 999=nok
+    cmp r10, $0x71
+    bne out_of_limits
+    lsl r4, r3, $16
+    orr r5, r4
 
     ldrb r10, [r9], $1
-    bl check_hex_digit
+    bl check_hex_digit // ret val: r3 int. status: r10 0=ok, 999=nok
+    cmp r10, $0x71
+    bne out_of_limits
+    lsl r4, r3, $12
+    orr r5, r4
 
     ldrb r10, [r9], $1
-    bl check_hex_digit
+    bl check_hex_digit // ret val: r3 int. status: r10 0=ok, 999=nok
+    cmp r10, $0x71
+    bne out_of_limits
+    lsl r4, r3, $8
+    orr r5, r4
 
     ldrb r10, [r9], $1
-    bl check_hex_digit
+    bl check_hex_digit // ret val: r3 int. status: r10 0=ok, 999=nok
+    cmp r10, $0x71
+    bne out_of_limits
+    lsl r4, r3, $4
+    orr r5, r4
 
     ldrb r10, [r9], $1
-    bl check_hex_digit
-
+    bl check_hex_digit // ret val: r3 int. status: r10 0=ok, 999=nok
+    cmp r10, $0x71
+    bne out_of_limits
+    lsl r4, r3, $0
+    orr r5, r4
 
 loop:
 // lue merkki
@@ -130,15 +152,15 @@ value_ok:
 //    mov r6, $4
 //    mul r5, r2, r6
 //    lsl r3, r3, r5 // hex digit shifted to left to correct place
-    bl debug_print
 
-    add r6, r6, $1  // hex_value loop counter for reading the string
-    add r1, r1, $1
+//    add r6, r6, $1  // hex_value loop counter for reading the string
+//    add r1, r1, $1
 
-    subs r2, $1
-    cmp r6, $3
+//    subs r2, $1
+//    cmp r6, $3
 //    blt loop   // counter > 0, continue looping
 
+    mov r3, $0x71
     b end
 
 // parameter length <> 8 chars
@@ -149,6 +171,7 @@ wrong_parameter_length:
     mov r7, $4          // SYS_WRITE = 4
     swi 0
 
+    mov r3, $0x82
     b end
 
 // invalid character
@@ -159,6 +182,7 @@ out_of_limits:
     mov r7, $4          // SYS_WRITE = 4
     swi 0
 
+    mov r3, $0x82
     b end
 
 end:
