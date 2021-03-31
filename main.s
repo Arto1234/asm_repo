@@ -1,14 +1,15 @@
 /* main.s
  _start function calls subfunctions
+Program is meant to be run in Raspberry Pi 3 and compatible.
 Arto Rasimus 1.3.2021 */
 .cpu cortex-a53
 .fpu neon-fp-armv8
 .syntax unified
 .section .rodata
 .align 2
-@ ---------------------------------------
-@	Data Section
-@ ---------------------------------------
+/* ---------------------------------------
+        Data Section
+ --------------------------------------- */
 .section .data
 str_function_name:
     .asciz "_start()\n"
@@ -23,9 +24,9 @@ message2:
     len_msg2 = .-message2
 
 
-@ ---------------------------------------
-@	Code Section
-@ ---------------------------------------
+/* ---------------------------------------
+        Code Section
+ --------------------------------------- */
 .section .text
 .align 2
 
@@ -39,10 +40,10 @@ _start:
     swi 0
 
     bl read_input     // returns value is stored in r4
-    bl gpio_mem_init  // returns kernel mapped addr in r0
+//    bl gpio_mem_init  // returns kernel mapped addr in r0
 
-    bl debug_print
-    bl gpio_input   // seg fault
+//    bl debug_print
+//    bl gpio_input   // seg fault
 
 
 /*
@@ -77,4 +78,3 @@ end:
     mov r0, $0        // exit with 0 exit code
     mov r7, $1        // SYS_EXIT
     swi 0             // SW interrupt
-
