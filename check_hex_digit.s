@@ -152,16 +152,18 @@ value_ok:
     mov r7, $4                      // SYS_WRITE = 4
     swi 0
 
+    mov r10, $0x71                  // hex conversion OK
+
     b end
 
 out_of_limits:
-    mov r10, $999  // invalid character (not hex)
-
     mov r0, $1                      // syscall
     ldr r1, =msg_err_wrong_value    // address of text string
     ldr r2, =strlen_msg_err_wrong_value // number of bytes to write
     mov r7, $4                      // SYS_WRITE = 4
     swi 0
+
+    mov r10, $0x82                  // failed. invalid character (not hex)
 
     b end
 
