@@ -41,9 +41,9 @@ Arto Rasimus 6.3.2021 */
 .syntax unified
 .section .rodata
 .align 2
-@ ---------------------------------------
-@	Data Section
-@ ---------------------------------------
+/* ---------------------------------------
+        Data Section
+ --------------------------------------- */
 .section .data
 str_function_name:
     .asciz "gpio_mode_select()\n"
@@ -93,35 +93,35 @@ funct:
     .byte  // GPIO function
 
 
-@ ---------------------------------------
-@       Block Starting Symbol Section
-@ ---------------------------------------
-@ The portion of an object that contains statically-allocated variables
-@ that are declared but have not been assigned a value yet
+/* ---------------------------------------
+        Block Starting Symbol Section
+ ---------------------------------------
+ The portion of an object that contains statically-allocated variables
+ that are declared but have not been assigned a value yet */
 
 //.section .bss
 
-@ ---------------------------------------
-@	Code Section
-@ ---------------------------------------
+/* ---------------------------------------
+        Code Section
+ --------------------------------------- */
 .section .text
 .align 2
 
-    GPFSEL0_OFFSET .equ 0x00 // pins  0.. 9 function selection
-    GPFSEL1_OFFSET .equ 0x04 // pins 10..19 function selection
-    GPFSEL2_OFFSET .equ 0x08 // pins 20..29 function selection
-    GPFSEL3_OFFSET .equ 0x0C // pins 30..39 function selection
-    GPFSEL4_OFFSET .equ 0x10 // pins 40..49 function selection
-    GPFSEL5_OFFSET .equ 0x14 // pins 50..53 function selection
+    .equ GPFSEL0_OFFSET, 0x00 // pins  0.. 9 function selection
+    .equ GPFSEL1_OFFSET, 0x04 // pins 10..19 function selection
+    .equ GPFSEL2_OFFSET, 0x08 // pins 20..29 function selection
+    .equ GPFSEL3_OFFSET, 0x0C // pins 30..39 function selection
+    .equ GPFSEL4_OFFSET, 0x10 // pins 40..49 function selection
+    .equ GPFSEL5_OFFSET, 0x14 // pins 50..53 function selection
 
-    GPFSET0_OFFSET .equ 0x1C // pins  0..31 output set 0
-    GPFSET1_OFFSET .equ 0x20 // pins 32..53 output set 1
+    .equ GPFSET0_OFFSET, 0x1C // pins  0..31 output set 0
+    .equ GPFSET1_OFFSET, 0x20 // pins 32..53 output set 1
 
-    GPFCLR0_OFFSET .equ 0x28 // pins  0..31 output clear 0
-    GPFCLR1_OFFSET .equ 0x2C // pins 32..53 output clear 1
+    .equ GPFCLR0_OFFSET, 0x28 // pins  0..31 output clear 0
+    .equ GPFCLR1_OFFSET, 0x2C // pins 32..53 output clear 1
 
-    GPFLEV0_OFFSET .equ 0x34 // pins  0..31 level 0
-    GPFLEV1_OFFSET .equ 0x38 // pins 32..53 level 1
+    .equ GPFLEV0_OFFSET, 0x34 // pins  0..31 level 0
+    .equ GPFLEV1_OFFSET, 0x38 // pins 32..53 level 1
 
 .global gpio_input
 .type gpio_input, %function
