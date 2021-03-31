@@ -77,6 +77,8 @@ str_r15:
   --------------------------------------- */
 .section .text
 .align 2
+.equ SYS_WRITE_C,  0x4
+
 .global debug_print
 .type debug_print, %function
 
@@ -88,7 +90,7 @@ debug_print:
     mov r0, $1                 // syscall
     ldr r1, =str_function_name // address of text string
     ldr r2, =strlen_function_name // number of bytes to write
-    mov r7, $4                // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
 r0:
@@ -96,7 +98,7 @@ r0:
     mov r0, $1            // syscall
     ldr r1, =str_r0       // address of text string
     ldr r2, =strlen_r0    // number of bytes to write
-    mov r7, $4            // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
     ldr r8, =r0_save      // copy the raw 32bit value to 'aux' register
@@ -109,7 +111,7 @@ r1:
     mov r0, $1            // syscall
     ldr r1, =str_r1       // address of text string
     ldr r2, =strlen_r1    // number of bytes to write
-    mov r7, $4            // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
     ldr r8, =r1_save      // copy the raw 32bit value to 'aux' register
@@ -122,7 +124,7 @@ r2:
     mov r0, $1            // syscall
     ldr r1, =str_r2       // address of text string
     ldr r2, =strlen_r2    // number of bytes to write
-    mov r7, $4            // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
     ldr r8, =r2_save      // copy the raw 32bit value to 'aux' register
@@ -135,7 +137,7 @@ r3:
     mov r0, $1            // syscall
     ldr r1, =str_r3       // address of text string
     ldr r2, =strlen_r3    // number of bytes to write
-    mov r7, $4            // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
     ldr r8, =r3_save      // copy the raw 32bit value to 'aux' register
@@ -148,7 +150,7 @@ r4:
     mov r0, $1            // syscall
     ldr r1, =str_r4       // address of text string
     ldr r2, =strlen_r4    // number of bytes to write
-    mov r7, $4            // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
     ldr r8, =r4_save      // copy the raw 32bit value to 'aux' register
@@ -161,7 +163,7 @@ r5:
     mov r0, $1            // syscall
     ldr r1, =str_r5       // address of text string
     ldr r2, =strlen_r5    // number of bytes to write
-    mov r7, $4            // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
     ldr r8, =r5_save      // copy the raw 32bit value to 'aux' register
@@ -174,7 +176,7 @@ r6:
     mov r0, $1            // syscall
     ldr r1, =str_r6       // address of text string
     ldr r2, =strlen_r6    // number of bytes to write
-    mov r7, $4            // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
     ldr r8, =r6_save      // copy the raw 32bit value to 'aux' register
@@ -187,7 +189,7 @@ r7:
     mov r0, $1            // syscall
     ldr r1, =str_r7       // address of text string
     ldr r2, =strlen_r7    // number of bytes to write
-    mov r7, $4            // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
     ldr r8, =r7_save      // copy the raw 32bit value to 'aux' register
@@ -200,7 +202,7 @@ r8:
     mov r0, $1            // syscall
     ldr r1, =str_r8       // address of text string
     ldr r2, =strlen_r8    // number of bytes to write
-    mov r7, $4            // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
                           // r9 just here, r8 for others...
@@ -214,7 +216,7 @@ r9:
     mov r0, $1            // syscall
     ldr r1, =str_r9       // address of text string
     ldr r2, =strlen_r9    // number of bytes to write
-    mov r7, $4            // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
     ldr r8, =r9_save      // copy the raw 32bit value to 'aux' register
@@ -228,7 +230,7 @@ r10:
     mov r0, $1            // syscall
     ldr r1, =str_r10      // address of text string
     ldr r2, =strlen_r10   // number of bytes to write
-    mov r7, $4            // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
     ldr r8, =r10_save     // copy the raw 32bit value to 'aux' register
@@ -242,7 +244,7 @@ r11:
     mov r0, $1            // syscall
     ldr r1, =str_r11      // address of text string
     ldr r2, =strlen_r11   // number of bytes to write
-    mov r7, $4            // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
     ldr r8, =r11_save     // copy the raw 32bit value to 'aux' register
@@ -256,7 +258,7 @@ r12:
     mov r0, $1            // syscall
     ldr r1, =str_r12      // address of text string
     ldr r2, =strlen_r12   // number of bytes to write
-    mov r7, $4            // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
     ldr r8, =r12_save     // copy the raw 32bit value to 'aux' register
@@ -270,7 +272,7 @@ r13:
     mov r0, $1            // syscall
     ldr r1, =str_r13      // address of text string
     ldr r2, =strlen_r13   // number of bytes to write
-    mov r7, $4            // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
     ldr r8, =r13_save     // copy the raw 32bit value to 'aux' register
@@ -284,7 +286,7 @@ r14:
     mov r0, $1            // syscall
     ldr r1, =str_r14      // address of text string
     ldr r2, =strlen_r14   // number of bytes to write
-    mov r7, $4            // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
     ldr r8, =r14_save     // copy the raw 32bit value to 'aux' register
@@ -298,7 +300,7 @@ r15:
     mov r0, $1            // syscall
     ldr r1, =str_r15      // address of text string
     ldr r2, =strlen_r15   // number of bytes to write
-    mov r7, $4            // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
     ldr r8, =r15_save     // copy the raw 32bit value to 'aux' register
