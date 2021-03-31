@@ -1,13 +1,15 @@
-// https://github.com/InfinitelyManic/Raspberry-Pi-2/blob/master/gpio_init_test_via_mmap.s
-
+/* Function copied from:
+   https://github.com/InfinitelyManic/Raspberry-Pi-2/blob/master/gpio_init_test_via_mmap.s
+   This function is run under userland, therefore used gpiomem device.
+   For bare metal usage, mem device. */
 .cpu cortex-a53
 .fpu neon-fp-armv8
 .syntax unified
 .section .rodata
 .align 2
-@ ---------------------------------------
-@       Data Section
-@ ---------------------------------------
+/* ---------------------------------------
+        Data Section
+ --------------------------------------- */
 .section .data
 str_function_name:
     .asciz "gpio_mem_init()\n"
@@ -19,6 +21,9 @@ str_function_name:
 retval:   .word
 
 
+/* ---------------------------------------
+        Code Section
+ --------------------------------------- */
 .section .text
 .align 2
 .global gpio_mem_init
