@@ -2,13 +2,13 @@
 This function reads one 32-bit value (8 hex characters) from stdin.
 Digits must be in hex. Value range: 00000000..FFFFFFFF.
 It reads input and returns it to _start.
-Value is returned in r3 as 32-bit hex value.
+Value is returned in r5 as 32-bit hex value.
 
 TODO: better input handling. Now is read only one char.
 TODO: reading from parameter file.
 Later could be read until <enter>.
 Program is meant to be run in Raspberry Pi 3 and compatible.
-Arto Rasimus 24.3.2021 */
+Arto Rasimus 31.3.2021 */
 .cpu cortex-a53
 .fpu neon-fp-armv8
 .syntax unified
@@ -16,7 +16,7 @@ Arto Rasimus 24.3.2021 */
 .align 2
 /* ---------------------------------------
         Data Section
- ---------------------------------------*/
+ --------------------------------------- */
 .section .data
 message:
     .asciz "Give number (0 = quit): "
