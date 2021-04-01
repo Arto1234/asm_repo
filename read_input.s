@@ -43,8 +43,8 @@ that are declared but have not been assigned a value yet */
 .section .text
 .align 2
 
-.equ SYS_CALL_R_C,  0x0
-.equ SYS_CALL_W_C,  0x1
+.equ STDIN_C,      0x0
+.equ STDOUT_C,     0x1
 .equ SYS_READ_C,   0x3
 .equ SYS_WRITE_C,  0x4
 .equ NIBBLE_LEN_C, 0x4
@@ -59,13 +59,13 @@ read_input:
 begin_function:
     push {lr}
     // print question string
-    mov r0, SYS_CALL_W_C
+    mov r0, STDOUT_C
     ldr r1, =message     // address of text string
     ldr r2, =strlen      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
 
-    mov r0, SYS_CALL_R_C
+    mov r0, STDIN_C
     ldr r1, =hex_value   //
     mov r2, $8           // Set max input size to 8 bytes: 8 chars
     mov r7, SYS_READ_C
@@ -105,7 +105,7 @@ value_ok:
 
 // parameter length <> 8 chars
 wrong_parameter_length:
-    mov r0, SYS_CALL_W_C
+    mov r0, STDOUT_C
     ldr r1, =msg_err_wrong_length         // address of text string
     ldr r2, =strlen_msg_err_wrong_length  // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -116,7 +116,7 @@ wrong_parameter_length:
 
 // invalid character
 out_of_limits:
-    mov r0, SYS_CALL_W_C
+    mov r0, STDOUT_C
     ldr r1, =msg_err_wrong_input          // address of text string
     ldr r2, =strlen_msg_err_wrong_input   // number of bytes to write
     mov r7, SYS_WRITE_C
