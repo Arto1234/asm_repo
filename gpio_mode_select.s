@@ -107,33 +107,43 @@ funct:
 .section .text
 .align 2
 
-.equ SYS_CALL_W_C, 0x1
+.equ STDOUT_C,     0x1
 .equ SYS_WRITE_C,  0x4
 .equ STATUS_OK_C,  0x71 // Return value from check_hex_digit()
 .equ STATUS_NOK_C, 0x82 // Return value from check_hex_digit()
 
-.equ GPFSEL0_OFFSET, 0x00 // pins  0.. 9 function selection
-.equ GPFSEL1_OFFSET, 0x04 // pins 10..19 function selection
-.equ GPFSEL2_OFFSET, 0x08 // pins 20..29 function selection
-.equ GPFSEL3_OFFSET, 0x0C // pins 30..39 function selection
-.equ GPFSEL4_OFFSET, 0x10 // pins 40..49 function selection
-.equ GPFSEL5_OFFSET, 0x14 // pins 50..53 function selection
+.equ GPFSEL0_OFFSET_C, 0x00 // pins  0.. 9 function selection
+.equ GPFSEL1_OFFSET_C, 0x04 // pins 10..19 function selection
+.equ GPFSEL2_OFFSET_C, 0x08 // pins 20..29 function selection
+.equ GPFSEL3_OFFSET_C, 0x0C // pins 30..39 function selection
+.equ GPFSEL4_OFFSET_C, 0x10 // pins 40..49 function selection
+.equ GPFSEL5_OFFSET_C, 0x14 // pins 50..53 function selection
 
-.equ GPFSET0_OFFSET, 0x1C // pins  0..31 output set 0
-.equ GPFSET1_OFFSET, 0x20 // pins 32..53 output set 1
+.equ GPFSET0_OFFSET_C, 0x1C // pins  0..31 output set 0
+.equ GPFSET1_OFFSET_C, 0x20 // pins 32..53 output set 1
 
-.equ GPFCLR0_OFFSET, 0x28 // pins  0..31 output clear 0
-.equ GPFCLR1_OFFSET, 0x2C // pins 32..53 output clear 1
+.equ GPFCLR0_OFFSET_C, 0x28 // pins  0..31 output clear 0
+.equ GPFCLR1_OFFSET_C, 0x2C // pins 32..53 output clear 1
 
-.equ GPFLEV0_OFFSET, 0x34 // pins  0..31 level 0
-.equ GPFLEV1_OFFSET, 0x38 // pins 32..53 level 1
+.equ GPFLEV0_OFFSET_C, 0x34 // pins  0..31 level 0
+.equ GPFLEV1_OFFSET_C, 0x38 // pins 32..53 level 1
+
+.equ GPEDS0_OFFSET_C,    0x00000040
+.equ GPEDS1_OFFSET_C,    0x00000044
+
+.equ GPHEN0_OFFSET_C,    0x00000064
+.equ GPHEN1_OFFSET_C,    0x00000068
+
+.equ GPPUD_OFFSET_C,     0x00000094
+.equ GPPUDCLK0_OFFSET_C, 0x00000098
+.equ GPPUDCLK1_OFFSET_C, 0x0000009C
 
 .global gpio_input
 .type gpio_input, %function
 gpio_input:
     push {lr}
 
-    mov r0, SYS_CALL_W_C
+    mov r0, STDOUT_C
     ldr r1, =str_function_name    // address of text string
     ldr r2, =strlen_function_name // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -150,33 +160,6 @@ begin:
 |  unused  | register |  pin_nr  |   mode   |
 |          |    r6    |    r5    |    r4    |
 --------------------------------------------- */
-function_selection:
-    .equ GPFSEL0,   0x00000000 // pins  0.. 9 function selection
-    .equ GPFSEL1,   0x00000004 // pins 10..19 function selection
-    .equ GPFSEL2,   0x00000008 // pins 20..29 function selection
-    .equ GPFSEL3,   0x0000000C // pins 30..39 function selection
-    .equ GPFSEL4,   0x00000010 // pins 40..49 function selection
-    .equ GPFSEL5,   0x00000014 // pins 50..53 function selection
-
-    .equ GPSET0,    0x0000001C // pins  0..31 output set 0
-    .equ GPSET1,    0x00000020 // pins 32..53 output set 1
-
-    .equ GPCLR0,    0x00000028 // pins  0..31 output clear 0
-    .equ GPCLR1,    0x0000002C // pins 32..53 output clear 1
-
-    .equ GPLEV0,    0x00000034 // pins  0..31 level 0
-    .equ GPLEV1,    0x00000038 // pins 32..53 level 1
-
-    .equ GPEDS0,    0x00000040
-    .equ GPEDS1,    0x00000044
-
-    .equ GPHEN0,    0x00000064
-    .equ GPHEN1,    0x00000068
-
-    .equ GPPUD,     0x00000094
-    .equ GPPUDCLK0, 0x00000098
-    .equ GPPUDCLK1, 0x0000009C
-
 
 ldr r3, =$0x00000201 // just testing
 
@@ -235,7 +218,7 @@ ldr r3, =$0x00000201 // just testing
     b print_wrong_func_sel    // otherwise quit
 
 print_wrong_func_sel:
-    mov r0, SYS_CALL_W_C
+    mov r0, STDOUT_C
     ldr r1, =msg_wrong_func_sel        // address of text string
     ldr r2, =strlen_msg_wrong_func_sel // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -256,7 +239,7 @@ r5 = pin_nr
 r8 = address, where mode selection bits will be shifted to
 */
 gpfsel0:
-    mov r0, SYS_CALL_W_C
+    mov r0, STDOUT_C
     ldr r1, =msg_gpfsel0               // address of text string
     ldr r2, =strlen_msg_func0_sel      // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -287,12 +270,11 @@ gpfsel0:
 
 
 //    mov r8, r4
-//    bl  debug_print
 
     b end
 
 gpfsel1:
-    mov r0, SYS_CALL_W_C
+    mov r0, STDOUT_C
     ldr r1, =msg_gpfsel1               // address of text string
     ldr r2, =strlen_msg_func1_sel      // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -300,7 +282,7 @@ gpfsel1:
 
 
 gpfsel2:
-    mov r0, SYS_CALL_W_C
+    mov r0, STDOUT_C
     ldr r1, =msg_gpfsel2               // address of text string
     ldr r2, =strlen_msg_func2_sel      // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -308,7 +290,7 @@ gpfsel2:
 
 
 gpfsel3:
-    mov r0, SYS_CALL_W_C
+    mov r0, STDOUT_C
     ldr r1, =msg_gpfsel3               // address of text string
     ldr r2, =strlen_msg_func3_sel      // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -316,7 +298,7 @@ gpfsel3:
 
 
 gpfsel4:
-    mov r0, SYS_CALL_W_C
+    mov r0, STDOUT_C
     ldr r1, =msg_gpfsel4               // address of text string
     ldr r2, =strlen_msg_func4_sel      // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -324,7 +306,7 @@ gpfsel4:
 
 
 gpfsel5:
-    mov r0, SYS_CALL_W_C
+    mov r0, STDOUT_C
     ldr r1, =msg_gpfsel5               // address of text string
     ldr r2, =strlen_msg_func5_sel      // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -332,7 +314,7 @@ gpfsel5:
 
 
 gpfset0:
-    mov r0, SYS_CALL_W_C
+    mov r0, STDOUT_C
     ldr r1, =msg_gpfset0               // address of text string
     ldr r2, =strlen_msg_func0_set      // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -340,7 +322,7 @@ gpfset0:
 
 
 gpfset1:
-    mov r0, SYS_CALL_W_C
+    mov r0, STDOUT_C
     ldr r1, =msg_gpfset1               // address of text string
     ldr r2, =strlen_msg_func1_set      // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -348,7 +330,7 @@ gpfset1:
 
 
 gpfclr0:
-    mov r0, SYS_CALL_W_C
+    mov r0, STDOUT_C
     ldr r1, =msg_gpfclr0               // address of text string
     ldr r2, =strlen_msg_func0_clr      // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -356,19 +338,15 @@ gpfclr0:
 
 
 gpfclr1:
-    mov r0, SYS_CALL_W_C
+    mov r0, STDOUT_C
     ldr r1, =msg_gpfclr1               // address of text string
     ldr r2, =strlen_msg_func1_clr      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
 
-
-print_msg_input:
-//    b begin
-
 end:
     pop {pc}
-//    bx  lr
+
 /*
 GPFSEL0 pins 0-9
 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00
