@@ -77,17 +77,18 @@ str_r15:
   --------------------------------------- */
 .section .text
 .align 2
-.equ SYS_WRITE_C,  0x4
+
+.equ STDOUT_C,    0x1
+.equ SYS_WRITE_C, 0x4
 
 .global debug_print
 .type debug_print, %function
-
 debug_print:
     push {lr}
 
     bl saveregs
     // This function prints values of registers r0..r15 to stdout.
-    mov r0, $1                 // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_function_name // address of text string
     ldr r2, =strlen_function_name // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -95,7 +96,7 @@ debug_print:
 
 r0:
     // print "GP r0 = 0x..."
-    mov r0, $1            // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_r0       // address of text string
     ldr r2, =strlen_r0    // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -108,7 +109,7 @@ r0:
 
 r1:
     // print "GP r1 = 0x..."
-    mov r0, $1            // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_r1       // address of text string
     ldr r2, =strlen_r1    // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -121,7 +122,7 @@ r1:
 
 r2:
     // print "GP r2 = 0x..."
-    mov r0, $1            // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_r2       // address of text string
     ldr r2, =strlen_r2    // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -134,7 +135,7 @@ r2:
 
 r3:
     // print "GP r3 = 0x..."
-    mov r0, $1            // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_r3       // address of text string
     ldr r2, =strlen_r3    // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -147,7 +148,7 @@ r3:
 
 r4:
     // print "GP r4 = 0x..."
-    mov r0, $1            // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_r4       // address of text string
     ldr r2, =strlen_r4    // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -160,7 +161,7 @@ r4:
 
 r5:
     // print "GP r5 = 0x..."
-    mov r0, $1            // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_r5       // address of text string
     ldr r2, =strlen_r5    // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -173,7 +174,7 @@ r5:
 
 r6:
     // print "GP r6 = 0x..."
-    mov r0, $1            // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_r6       // address of text string
     ldr r2, =strlen_r6    // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -186,7 +187,7 @@ r6:
 
 r7:
     // print "SY r7 = 0x..."
-    mov r0, $1            // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_r7       // address of text string
     ldr r2, =strlen_r7    // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -199,7 +200,7 @@ r7:
 
 r8:
     // print "GP r8 = 0x..."
-    mov r0, $1            // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_r8       // address of text string
     ldr r2, =strlen_r8    // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -213,7 +214,7 @@ r8:
 
 r9:
     // print "GP r9 = 0x..."
-    mov r0, $1            // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_r9       // address of text string
     ldr r2, =strlen_r9    // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -227,7 +228,7 @@ r9:
 
 r10:
     // print "GP r10 = 0x..."
-    mov r0, $1            // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_r10      // address of text string
     ldr r2, =strlen_r10   // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -241,7 +242,7 @@ r10:
 
 r11:
     // print "FP r11 = 0x..."
-    mov r0, $1            // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_r11      // address of text string
     ldr r2, =strlen_r11   // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -255,7 +256,7 @@ r11:
 
 r12:
     // print "IP r12 = 0x..."
-    mov r0, $1            // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_r12      // address of text string
     ldr r2, =strlen_r12   // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -269,7 +270,7 @@ r12:
 
 r13:
     // print "SP r13 = 0x..."
-    mov r0, $1            // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_r13      // address of text string
     ldr r2, =strlen_r13   // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -283,7 +284,7 @@ r13:
 
 r14:
     // print "LR r14 = 0x..."
-    mov r0, $1            // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_r14      // address of text string
     ldr r2, =strlen_r14   // number of bytes to write
     mov r7, SYS_WRITE_C
@@ -297,7 +298,7 @@ r14:
 
 r15:
     // print "PC r15 = 0x..."
-    mov r0, $1            // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_r15      // address of text string
     ldr r2, =strlen_r15   // number of bytes to write
     mov r7, SYS_WRITE_C
