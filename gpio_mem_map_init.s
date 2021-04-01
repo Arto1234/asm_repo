@@ -30,6 +30,8 @@ retval:   .word
 .equ STDOUT_C,     0x1
 .equ SYS_WRITE_C,  0x4
 .equ PAGE_SIZE_C,  0x4096
+.equ FLAGS_C,      06010002
+.equ GPIO_BASE_C,  0x3F200000
 
 .global gpio_mem_init
 .type gpio_mem_init, %function
@@ -40,10 +42,9 @@ gpio_mem_init:
     mov r7, SYS_WRITE_C
     swi 0
 
-    .addr_file:     .word   .file           // pointer to .file
-    .flags:         .word   06010002        // rw . x       // 0x181002
-    .gpiobase:      .word   0x3F200000      // base address for BCM2836
-
+    .addr_file:     .word   .file          // pointer to .file
+    .flags:         .word   FLAGS_C        // rw . x       // 0x181002
+    .gpiobase:      .word   GPIO_BASE_C    // base address for BCM2836
 
 open_file:
     push {r1-r3, lr}
@@ -58,8 +59,8 @@ map_file:
     ldr r3, [sp, #0]                    // copy file handle to r3
     // parameters for mmap              // nmap will map files or devices into memory
     str r3, [sp, #0]                    // copy file handle to 1st level of stack for mmap
-    ldr r3,.gpiobase                    // GPIO base address
-    str r3, [sp, #4]                    // store GPIO base to 2nd level of stack        for mmap
+    ldr r3, .gpiobase                   // GPIO base address
+    str r3, [sp, #4]                    // store GPIO base to 2nd level of stack for mmap
     mov r0, #0                          // null address - let the kernel choose the address
     mov r1, PAGE_SIZE_C
     mov r2, #3                          // desired memory protection type ???
