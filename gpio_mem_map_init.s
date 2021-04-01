@@ -26,13 +26,18 @@ retval:   .word
  --------------------------------------- */
 .section .text
 .align 2
+
+.equ STDOUT_C,     0x1
+.equ SYS_WRITE_C,  0x4
+.equ PAGE_SIZE_C,  0x4096
+
 .global gpio_mem_init
 .type gpio_mem_init, %function
 gpio_mem_init:
-    mov r0, $1                    // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_function_name    // address of text string
     ldr r2, =strlen_function_name // number of bytes to write
-    mov r7, $4                    // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
     .addr_file:     .word   .file           // pointer to .file
@@ -56,9 +61,9 @@ map_file:
     ldr r3,.gpiobase                    // GPIO base address
     str r3, [sp, #4]                    // store GPIO base to 2nd level of stack        for mmap
     mov r0, #0                          // null address - let the kernel choose the address
-    mov r1, #4096                       // page size
+    mov r1, PAGE_SIZE_C
     mov r2, #3                          // desired memory protection type ???
-    mov r3, #1                          // stdout
+    mov r3, STDOUT_C
     bl mmap                             // call mmap; returns kernel mapped addr in r0
 
     pop {r1-r3, pc}
