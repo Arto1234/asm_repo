@@ -64,7 +64,7 @@ map_file:
     mov r0, #0                          // null address - let the kernel choose the address
     mov r1, PAGE_SIZE_C
     mov r2, #3                          // desired memory protection type ???
-    mov r3, STDOUT_C
+    mov r3, #1
     bl mmap                             // call mmap; returns kernel mapped addr in r0
 
     pop {r1-r3, pc}
