@@ -2,7 +2,7 @@
 This function reads one 32-bit value (8 hex characters) from stdin.
 Digits must be in hex. Value range: 00000000..FFFFFFFF.
 It reads input and returns it to _start.
-Value is returned in r5 as 32-bit hex value.
+Value is returned in r3 as 32-bit hex value.
 
 TODO: reading from parameter file or fixed constant data.
 Arto Rasimus 31.3.2021 */
@@ -16,7 +16,7 @@ Arto Rasimus 31.3.2021 */
  --------------------------------------- */
 .section .data
 message:
-    .asciz "Give number (0 = quit): "
+    .asciz "Give 8 hex digit GPIO mode select: "
     strlen = .-message
 
 msg_err_wrong_input:
@@ -130,5 +130,5 @@ end:
        r8:  var addr
        r9:  out (to print_char)
        r11: aux addr for var addr */
-    bl debug_print
+    //bl debug_print
     pop {pc}
