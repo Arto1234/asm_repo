@@ -10,10 +10,10 @@ Purpose 1: To learn basics of ARM assembly.
 Purpose 2: To create a way to make GPIO modeset configurations for Raspberry Pi, according to a fixed configuration set.
 
 TODO:
-1. GPIO mode parameters' reading in a parametrised way. Now functions basically from stdin.
+1. GPIO mode parameters' reading in a parametrised way. Now that functions in a very basic way via stdin.
 2. Raspberry Pi 3 GPIO mode settings' verifying.
 3. Program that reads events from certain GPIO inputs and calculates their amount per time frame.
 
 I'll may do the Part 3 with C (considering also asm).
 
-Arto Rasimus 31 Mar 2021
+Arto Rasimus 3 Apr 2021
