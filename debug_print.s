@@ -81,13 +81,13 @@ str_r15:
 .equ STDOUT_C,    0x1
 .equ SYS_WRITE_C, 0x4
 
+// This function prints values of registers r0..r15 to stdout.
 .global debug_print
 .type debug_print, %function
 debug_print:
     push {lr}
 
     bl saveregs
-    // This function prints values of registers r0..r15 to stdout.
     mov r0, STDOUT_C
     ldr r1, =str_function_name // address of text string
     ldr r2, =strlen_function_name // number of bytes to write
