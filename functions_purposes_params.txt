@@ -1,0 +1,14 @@
+comp                Compilation and linking commands
+
+main.s              _start function calls subfunctions. Program is meant to be run in Raspberry Pi 3 and compatible.   
+check_hex_digit.s   This function reads ASCII value from r10 and checks it (valid hex or not)                          IN: r10   OUT: converted value: r3, status: r10
+
+debug_print.s       Function prints several ARM registers' contents as 8 digit hex to stdout.                                    OUT: r9
+                    Purpose is to help debugging in development phase.                                                 
+print_char.s        Function reads value from r9 and prints it in 8-digit hex to stdout. Used by debug_print().        IN: r9    
+saveregs.s          Function saves registers' contents to global variables. Used by debug_print().                     
+
+gpio_mem_map_init.s Initialisation of gpiomem device. Used from another repository.                                    
+read_input.s        Function reads one 32-bit value (8 hex characters) from stdin. Used by GPIO mode selection        (IN: r1)   OUT: r5
+                    in function gpio_input.
+gpio_mode_select.s  Function initialises Raspberry Pi 3's selected GPIO pins for selected function.                    
