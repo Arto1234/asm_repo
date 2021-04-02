@@ -1,5 +1,5 @@
 /* main.s
- _start function calls subfunctions
+_start function calls subfunctions
 Program is meant to be run in Raspberry Pi 3 and compatible.
 Arto Rasimus 1.3.2021 */
 .cpu cortex-a53
@@ -39,11 +39,9 @@ _start:
     mov r7, $4                    // SYS_WRITE = 4
     swi 0
 
+    bl gpio_mem_init  // returns kernel mapped addr in r0
     bl read_input     // returns value is stored in r4
-//    bl gpio_mem_init  // returns kernel mapped addr in r0
-
-//    bl debug_print
-//    bl gpio_input   // seg fault
+    bl gpio_input
 
 
 /*
