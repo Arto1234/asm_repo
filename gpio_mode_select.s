@@ -3,12 +3,12 @@ This function initialises Raspberry Pi 3's
 selected GPIO pins for selected function.
 Command will be given in r4 for every GPIO pin individually.
 
-Input param: r3
+Input param: r5
 --------------------------------------------
 |  unused  | register |  pin nr  |   mode   |
 ---------------------------------------------
-r3 byte 0: mode select
-r4
+r5 byte 0: mode select
+r8
 000 = GPIO Pin x is an input
 001 = GPIO Pin x is an output
 100 = GPIO Pin x takes alternate function 0
@@ -18,22 +18,22 @@ r4
 011 = GPIO Pin x takes alternate function 4
 010 = GPIO Pin x takes alternate function 5
 
-r3 byte 1: pin number within tens group
-r5
+r5 byte 1: pin number within tens group
+r9
 0..9, pin number in the section will be processed
 e.g. pin 6: bits 20 19 18 will be processed.
 
-r3 byte 2: tens group
-r6
-r6 = 0,  GPFSEL0 will be processed
-r6 = 1,  GPFSEL1
-r6 = 2,  GPFSEL2
-r6 = 3,  GPFSEL3
-r6 = 4,  GPFSEL4
-r6 = 5,  GPFSEL5
+r5 byte 2: tens group
+r10
+r10 = 0,  GPFSEL0 will be processed
+r10 = 1,  GPFSEL1
+r10 = 2,  GPFSEL2
+r10 = 3,  GPFSEL3
+r10 = 4,  GPFSEL4
+r10 = 5,  GPFSEL5
 
 r0 = base address 0x3F200000
-r8 = offset from base address
+r6 = offset from base address
 
 Arto Rasimus 6.3.2021 */
 .cpu cortex-a53
@@ -152,29 +152,27 @@ gpio_input:
 //    b print_msg_input
 
 begin:
-//    bl  debug_print
+//    bl debug_print
 
 
-/* Input param: r3
+/* Input param: r5
 --------------------------------------------
 |  unused  | register |  pin_nr  |   mode   |
-|          |    r6    |    r5    |    r4    |
+|          |    r10   |    r9    |    r8    |
 --------------------------------------------- */
 
-ldr r3, =$0x00000201 // just testing
+//ldr r5, =$0x00000201 // just testing
 
-    mov r4, r3
-    and r4, $0x000000ff    // get byte 0: mode value
+    mov r8, r5
+    and r8, $0x000000ff    // get byte 0: mode value
 
-    mov r5, r3
-    and r5, $0x0000ff00    // get byte 1: pin nr
-    lsr r5, $8             // shift the bits to byte 0
+    mov r9, r5
+    and r9, $0x0000ff00    // get byte 1: pin nr
+    lsr r9, $8             // shift the bits to byte 0
 
-    mov r6, r3
-    and r6, $0x00ff0000    // get byte 2: register
-    lsr r6, $16            // shift the bits to byte 0
-
-//    bl  debug_print
+    mov r10, r5
+    and r10, $0x00ff0000    // get byte 2: register
+    lsr r10, $16            // shift the bits to byte 0
 
 //    ldr r0, =mode          // load address of mode to r0
 //    ldr r4, [r0]
@@ -185,34 +183,36 @@ ldr r3, =$0x00000201 // just testing
 //    ldr r0, =funct
 //    ldr r6, [r0]
 
-    tst r6, $0              // checked if r4 == 0: GPFSEL0
+//    bl debug_print
+
+    cmp r10, $0              // checked if r4 == 0: GPFSEL0
     beq gpfsel0
 
-    tst r6, $1              // checked if r4 == 1: GPFSEL1
+    cmp r10, $1              // checked if r4 == 1: GPFSEL1
     beq gpfsel1
 
-    tst r6, $2              // checked if r4 == 2: GPFSEL2
+    cmp r10, $2              // checked if r4 == 2: GPFSEL2
     beq gpfsel2
 
-    tst r6, $3              // checked if r4 == 3: GPFSEL3
+    cmp r10, $3              // checked if r4 == 3: GPFSEL3
     beq gpfsel3
 
-    tst r6, $4              // checked if r4 == 4: GPFSEL4
+    cmp r10, $4              // checked if r4 == 4: GPFSEL4
     beq gpfsel4
 
-    tst r6, $5              // checked if r4 == 5: GPFSEL5
+    cmp r10, $5              // checked if r4 == 5: GPFSEL5
     beq gpfsel5
 
-    tst r6, $7              // GPFSET0
+    cmp r10, $7              // GPFSET0
     beq gpfset0
 
-    tst r6, $8              // GPFSET1
+    cmp r10, $8              // GPFSET1
     beq gpfset1
 
-    tst r6, $10             // GPFCLR0
+    cmp r10, $10             // GPFCLR0
     beq gpfclr0
 
-    tst r6, $11             // GPFCLR1
+    cmp r10, $11             // GPFCLR1
     beq gpfclr1
 
     b print_wrong_func_sel    // otherwise quit
@@ -226,17 +226,17 @@ print_wrong_func_sel:
 
     b end
 
-/* Input param: r3
+/* Input param: r5
 --------------------------------------------
 |  unused  | register |  pin nr  |   mode   |
-|          |    r6    |    r5    |    r4    |
+|          |    r10   |    r9    |    r8    |
 ---------------------------------------------
 r0 = GPIO base address
 r1 = GPIO mode bit location (0..31)
 r3 = bit location
-r4 = mode
-r5 = pin_nr
-r8 = address, where mode selection bits will be shifted to
+r8 = mode
+r9 = pin_nr
+r6 = address, where mode selection bits will be shifted to
 */
 gpfsel0:
     mov r0, STDOUT_C
@@ -244,20 +244,20 @@ gpfsel0:
     ldr r2, =strlen_msg_func0_sel      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
-
+    bl debug_print
 //    ldr r0, gpio_start_addr            // load GPIO start address
 //    mov r2, r4                         // mode value (for 'output' it is 001)
 
     // Pin_nr * 3  --> r1
     // E.g. if r5 = (pin) 4, then r1 = r5 * 3 = 12 (bit position)
 
-    // shiftin määrä
+    // amount of shifted bits
     mov r1, r4  // mode
 
-    // 3* pin_nr: oikean bitin kohdalle
+    // 3* pin_nr: to the place of correct bit
     mov r2, $0
-    add r2, r5, r5, lsl $1             // r5 * 3 --> r3   r5 = r5 + (r5 << 1)
-    lsl r1, r2   // mode bits are shifted left (3 x pin_nr)
+    add r2, r5, r9, lsl $1             // r9 * 3 --> r5   r9 = r9 + (r9 << 1)
+    lsl r1, r2                         // mode bits are shifted left (3 x pin_nr)
 
     // r2 contains correct bit shift conter
 //    lsl r4, r2  // mode bits are shifted to the GPIO pin's place
@@ -279,71 +279,72 @@ gpfsel1:
     ldr r2, =strlen_msg_func1_sel      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
-
-
+    bl debug_print
+    b end
 gpfsel2:
     mov r0, STDOUT_C
     ldr r1, =msg_gpfsel2               // address of text string
     ldr r2, =strlen_msg_func2_sel      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
-
-
+    bl debug_print
+    b end
 gpfsel3:
     mov r0, STDOUT_C
     ldr r1, =msg_gpfsel3               // address of text string
     ldr r2, =strlen_msg_func3_sel      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
-
-
+    bl debug_print
+    b end
 gpfsel4:
     mov r0, STDOUT_C
     ldr r1, =msg_gpfsel4               // address of text string
     ldr r2, =strlen_msg_func4_sel      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
-
-
+    bl debug_print
+    b end
 gpfsel5:
     mov r0, STDOUT_C
     ldr r1, =msg_gpfsel5               // address of text string
     ldr r2, =strlen_msg_func5_sel      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
-
-
+    bl debug_print
+    b end
 gpfset0:
     mov r0, STDOUT_C
     ldr r1, =msg_gpfset0               // address of text string
     ldr r2, =strlen_msg_func0_set      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
-
-
+    bl debug_print
+    b end
 gpfset1:
     mov r0, STDOUT_C
     ldr r1, =msg_gpfset1               // address of text string
     ldr r2, =strlen_msg_func1_set      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
-
-
+    bl debug_print
+    b end
 gpfclr0:
     mov r0, STDOUT_C
     ldr r1, =msg_gpfclr0               // address of text string
     ldr r2, =strlen_msg_func0_clr      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
-
-
+    bl debug_print
+    b end
 gpfclr1:
     mov r0, STDOUT_C
     ldr r1, =msg_gpfclr1               // address of text string
     ldr r2, =strlen_msg_func1_clr      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
-
+    bl debug_print
+    b end
 end:
     pop {pc}
 
