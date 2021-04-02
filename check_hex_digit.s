@@ -148,7 +148,6 @@ check_hex_digit:
 //    b out_of_limits
 
 value_ok:
-    mov r10, $0
 /*
     mov r0, $1                      // syscall
     ldr r1, =msg_value_ok           // address of text string
