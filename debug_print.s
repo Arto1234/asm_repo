@@ -89,7 +89,7 @@ debug_print:
 
     bl saveregs
     mov r0, STDOUT_C
-    ldr r1, =str_function_name // address of text string
+    ldr r1, =str_function_name    // address of text string
     ldr r2, =strlen_function_name // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
@@ -102,8 +102,8 @@ r0:
     mov r7, SYS_WRITE_C
     swi 0
 
-    ldr r8, =r0_save      // copy the raw 32bit value to 'aux' register
-    ldr r11, [r8]         // copy the raw integer value to 'auxiliary' register
+    ldr r8, =r0_save      // set the address of variable to 'aux' register
+    ldr r11, [r8]         // copy the raw integer value to the variable
     mov r9, r11
     bl print_char
 
@@ -115,8 +115,8 @@ r1:
     mov r7, SYS_WRITE_C
     swi 0
 
-    ldr r8, =r1_save      // copy the raw 32bit value to 'aux' register
-    ldr r11, [r8]         // copy the raw integer value to 'auxiliary' register
+    ldr r8, =r1_save      // set the address of variable to 'aux' register
+    ldr r11, [r8]         // copy the raw integer value to the variable
     mov r9, r11
     bl print_char
 
@@ -128,8 +128,8 @@ r2:
     mov r7, SYS_WRITE_C
     swi 0
 
-    ldr r8, =r2_save      // copy the raw 32bit value to 'aux' register
-    ldr r11, [r8]         // copy the raw integer value to 'auxiliary' register
+    ldr r8, =r2_save      // set the address of variable to 'aux' register
+    ldr r11, [r8]         // copy the raw integer value to the variable
     mov r9, r11
     bl print_char
 
@@ -141,8 +141,8 @@ r3:
     mov r7, SYS_WRITE_C
     swi 0
 
-    ldr r8, =r3_save      // copy the raw 32bit value to 'aux' register
-    ldr r11, [r8]         // copy the raw integer value to 'auxiliary' register
+    ldr r8, =r3_save      // set the address of variable to 'aux' register
+    ldr r11, [r8]         // copy the raw integer value to the variable
     mov r9, r11
     bl print_char
 
@@ -154,8 +154,8 @@ r4:
     mov r7, SYS_WRITE_C
     swi 0
 
-    ldr r8, =r4_save      // copy the raw 32bit value to 'aux' register
-    ldr r11, [r8]         // copy the raw integer value to 'auxiliary' register
+    ldr r8, =r4_save      // set the address of variable to 'aux' register
+    ldr r11, [r8]         // copy the raw integer value to the variable
     mov r9, r11
     bl print_char
 
@@ -167,8 +167,8 @@ r5:
     mov r7, SYS_WRITE_C
     swi 0
 
-    ldr r8, =r5_save      // copy the raw 32bit value to 'aux' register
-    ldr r11, [r8]         // copy the raw integer value to 'auxiliary' register
+    ldr r8, =r5_save      // set the address of variable to 'aux' register
+    ldr r11, [r8]         // copy the raw integer value to the variable
     mov r9, r11
     bl print_char
 
@@ -180,8 +180,8 @@ r6:
     mov r7, SYS_WRITE_C
     swi 0
 
-    ldr r8, =r6_save      // copy the raw 32bit value to 'aux' register
-    ldr r11, [r8]         // copy the raw integer value to 'auxiliary' register
+    ldr r8, =r6_save      // set the address of variable to 'aux' register
+    ldr r11, [r8]         // copy the raw integer value to the variable
     mov r9, r11
     bl print_char
 
@@ -193,8 +193,8 @@ r7:
     mov r7, SYS_WRITE_C
     swi 0
 
-    ldr r8, =r7_save      // copy the raw 32bit value to 'aux' register
-    ldr r11, [r8]         // copy the raw integer value to 'auxiliary' register
+    ldr r8, =r7_save      // set the address of variable to 'aux' register
+    ldr r11, [r8]         // copy the raw integer value to the variable
     mov r9, r11
     bl print_char
 
@@ -207,8 +207,8 @@ r8:
     swi 0
 
                           // r9 just here, r8 for others...
-    ldr r9, =r8_save      // copy the raw 32bit value to 'aux' register
-    ldr r11, [r9]         // copy the raw integer value to 'auxiliary' register
+    ldr r9, =r8_save      // set the address of variable to 'aux' register
+    ldr r11, [r9]         // copy the raw integer value to the variable
     mov r9, r11
     bl print_char
 
@@ -220,8 +220,8 @@ r9:
     mov r7, SYS_WRITE_C
     swi 0
 
-    ldr r8, =r9_save      // copy the raw 32bit value to 'aux' register
-    ldr r11, [r8]         // copy the raw integer value to 'auxiliary' register
+    ldr r8, =r9_save      // set the address of variable to 'aux' register
+    ldr r11, [r8]         // copy the raw integer value to the variable
     mov r9, r11
 
     bl print_char
@@ -234,8 +234,8 @@ r10:
     mov r7, SYS_WRITE_C
     swi 0
 
-    ldr r8, =r10_save     // copy the raw 32bit value to 'aux' register
-    ldr r11, [r8]         // copy the raw integer value to 'auxiliary' register
+    ldr r8, =r10_save     // set the address of variable to 'aux' register
+    ldr r11, [r8]         // copy the raw integer value to the variable
     mov r9, r11
 
     bl print_char
@@ -248,8 +248,8 @@ r11:
     mov r7, SYS_WRITE_C
     swi 0
 
-    ldr r8, =r11_save     // copy the raw 32bit value to 'aux' register
-    ldr r10, [r8]         // copy the raw integer value to 'auxiliary' register
+    ldr r8, =r11_save     // set the address of variable to 'aux' register
+    ldr r10, [r8]         // copy the raw integer value to the variable
     mov r9, r10
 
     bl print_char
@@ -262,8 +262,8 @@ r12:
     mov r7, SYS_WRITE_C
     swi 0
 
-    ldr r8, =r12_save     // copy the raw 32bit value to 'aux' register
-    ldr r11, [r8]         // copy the raw integer value to 'auxiliary' register
+    ldr r8, =r12_save     // set the address of variable to 'aux' register
+    ldr r11, [r8]         // copy the raw integer value to the variable
     mov r9, r11
 
     bl print_char
@@ -276,8 +276,8 @@ r13:
     mov r7, SYS_WRITE_C
     swi 0
 
-    ldr r8, =r13_save     // copy the raw 32bit value to 'aux' register
-    ldr r11, [r8]         // copy the raw integer value to 'auxiliary' register
+    ldr r8, =r13_save     // set the address of variable to 'aux' register
+    ldr r11, [r8]         // copy the raw integer value to the variable
     mov r9, r11
 
     bl print_char
@@ -290,8 +290,8 @@ r14:
     mov r7, SYS_WRITE_C
     swi 0
 
-    ldr r8, =r14_save     // copy the raw 32bit value to 'aux' register
-    ldr r11, [r8]         // copy the raw integer value to 'auxiliary' register
+    ldr r8, =r14_save     // set the address of variable to 'aux' register
+    ldr r11, [r8]         // copy the raw integer value to the variable
     mov r9, r11
 
     bl print_char
@@ -304,8 +304,8 @@ r15:
     mov r7, SYS_WRITE_C
     swi 0
 
-    ldr r8, =r15_save     // copy the raw 32bit value to 'aux' register
-    ldr r11, [r8]         // copy the raw integer value to 'auxiliary' register
+    ldr r8, =r15_save     // set the address of variable to 'aux' register
+    ldr r11, [r8]         // copy the raw integer value to the variable
     mov r9, r11
 
     bl print_char
