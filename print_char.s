@@ -30,6 +30,9 @@ str_x:
 .section .text
 .align 2
 
+.equ STDOUT_C,     0x1
+.equ SYS_WRITE_C,  0x4
+
 .global print_char
 .type print_char, %function
 print_char:
@@ -141,10 +144,10 @@ print_space:
     ldr r8, =str_x         // just to get the address of the text string to r9
     str r10, [r8]          /* address of r9 (i.e. start of the string)
                              used for storing the ASCII char number */
-    mov r0, $1             // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_x         // address of text string
     ldr r2, =strlen_x      // number of bytes to write
-    mov r7, $4             // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
     b loop
 
@@ -154,14 +157,13 @@ nl:
     str r10, [r8]          /* address of r9 (i.e. start of the string)
                               used for storing the ASCII char number */
 
-    mov r0, $1             // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_x         // address of text string
     ldr r2, =strlen_x      // number of bytes to write
-    mov r7, $4             // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
 end:
-//    bx  lr
     pop {pc}
 
 
