@@ -14,6 +14,6 @@ TODO:
 2. Raspberry Pi 3 GPIO mode settings' verifying.
 3. Program that reads events from certain GPIO inputs and calculates their amount per time frame.
 
-I'll may do the Part 3 with C (considering also asm).
+I may do the Part 3 with C (considering also asm).
 
-Arto Rasimus 3 Apr 2021
+Arto Rasimus 7 Apr 2021
