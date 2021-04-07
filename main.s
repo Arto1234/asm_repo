@@ -41,7 +41,7 @@ _start:
 
     bl gpio_mem_init  // returns kernel mapped addr in r0
     bl read_input     // returns value is stored in r4
-    bl gpio_input
+    bl gpio_mode_select
 
 
 /*
