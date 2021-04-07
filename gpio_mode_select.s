@@ -48,50 +48,64 @@ Arto Rasimus 6.3.2021 */
 str_function_name:
     .asciz "gpio_mode_select()\n"
     strlen_function_name = .-str_function_name
-nl:
+str_nl:
     .asciz "\n"
-    strlen_nl = .-nl
-msg_gpfsel0:
+    strlen_nl = .-str_nl
+str_gpfsel0:
     .asciz "GPIO function 0 selected\n"        // 0
-    strlen_msg_func0_sel = .-msg_gpfsel0
-msg_gpfsel1:
+    strlen_str_func0_sel = .-str_gpfsel0
+str_gpfsel1:
     .asciz "GPIO function 1 selected\n"        // 1
-    strlen_msg_func1_sel = .-msg_gpfsel1
-msg_gpfsel2:
+    strlen_str_func1_sel = .-str_gpfsel1
+str_gpfsel2:
     .asciz "GPIO function 2 selected\n"        // 2
-    strlen_msg_func2_sel = .-msg_gpfsel2
-msg_gpfsel3:
+    strlen_str_func2_sel = .-str_gpfsel2
+str_gpfsel3:
     .asciz "GPIO function 3 selected\n"        // 3
-    strlen_msg_func3_sel = .-msg_gpfsel3
-msg_gpfsel4:
+    strlen_str_func3_sel = .-str_gpfsel3
+str_gpfsel4:
     .asciz "GPIO function 4 selected\n"        // 4
-    strlen_msg_func4_sel = .-msg_gpfsel4
-msg_gpfsel5:
+    strlen_str_func4_sel = .-str_gpfsel4
+str_gpfsel5:
     .asciz "GPIO function 5 selected\n"        // 5
-    strlen_msg_func5_sel = .-msg_gpfsel5
-msg_gpfset0:
+    strlen_str_func5_sel = .-str_gpfsel5
+str_gpfset0:
     .asciz "GPIO SET function 0 selected\n"    // 6
-    strlen_msg_func0_set = .-msg_gpfset0
-msg_gpfset1:
+    strlen_str_func0_set = .-str_gpfset0
+str_gpfset1:
     .asciz "GPIO SET function 1 selected\n"    // 7
-    strlen_msg_func1_set = .-msg_gpfset1
-msg_gpfclr0:
+    strlen_str_func1_set = .-str_gpfset1
+str_gpfclr0:
     .asciz "GPIO CLR function 0 selected\n"    // 10
-    strlen_msg_func0_clr = .-msg_gpfclr0
-msg_gpfclr1:
+    strlen_str_func0_clr = .-str_gpfclr0
+str_gpfclr1:
     .asciz "GPIO CLR function 1 selected\n"    // 11
-    strlen_msg_func1_clr = .-msg_gpfclr1
-msg_wrong_func_sel:
+    strlen_str_func1_clr = .-str_gpfclr1
+
+str_function:
+    .asciz "function = "
+    strlen_function = .-str_function
+
+str_pin:
+    .asciz "pin = "
+    strlen_pin = .-str_pin
+
+str_mode:
+    .ascii "mode = "
+    strlen_mode = .-str_mode
+
+str_wrong_func_sel:
     .asciz "Wrong function selected\n"
-    strlen_msg_wrong_func_sel = .-msg_wrong_func_sel
+    strlen_str_wrong_func_sel = .-str_wrong_func_sel
 
+/*
 mode:
-    .byte  // GPIO mode select
+    .word  // GPIO mode select
 pin:
-    .byte  // GPIO pin number
-funct:
-    .byte  // GPIO function
-
+    .word  // GPIO pin number
+function:
+    .word  // GPIO function
+*/
 
 /* ---------------------------------------
         Block Starting Symbol Section
@@ -99,7 +113,11 @@ funct:
  The portion of an object that contains statically-allocated variables
  that are declared but have not been assigned a value yet */
 
-//.section .bss
+.section .bss
+    .lcomm mode,     4
+    .lcomm pin,      4
+    .lcomm function, 4
+
 
 /* ---------------------------------------
         Code Section
@@ -138,9 +156,9 @@ funct:
 .equ GPPUDCLK0_OFFSET_C, 0x00000098
 .equ GPPUDCLK1_OFFSET_C, 0x0000009C
 
-.global gpio_input
-.type gpio_input, %function
-gpio_input:
+.global gpio_mode_select
+.type gpio_mode_select, %function
+gpio_mode_select:
     push {lr}
 
     mov r0, STDOUT_C
@@ -157,33 +175,109 @@ begin:
 
 /* Input param: r5
 --------------------------------------------
-|  unused  | register |  pin_nr  |   mode   |
-|          |    r10   |    r9    |    r8    |
---------------------------------------------- */
+|  unused  | function |  pin_nr  |   mode   |
+|          |    r12   |    r9    |    r8    |
+--------------------------------------------- 
+r10 is used by read_input()
+*/
 
-//ldr r5, =$0x00000201 // just testing
-
-    mov r8, r5
+    // mode ----------------------------------
+    mov r8, r5             // save input param to local use
     and r8, $0x000000ff    // get byte 0: mode value
 
-    mov r9, r5
+    mov r11, r8
+    // Convert the value to ASCII to r11, just for debugging purpose
+    add r11, $48
+    ldr r6, =mode          // load the var addr to r6
+    str r11, [r6]          // store the value to var
+
+    // pin -----------------------------------
+    mov r9, r5             // save input param to local use
     and r9, $0x0000ff00    // get byte 1: pin nr
     lsr r9, $8             // shift the bits to byte 0
 
-    mov r10, r5
-    and r10, $0x00ff0000    // get byte 2: register
-    lsr r10, $16            // shift the bits to byte 0
+    mov r11, r9
+    // Convert the value to ASCII to r11, just for debugging purpose
+    add r11, $48
+    ldr r6, =pin           // load the var addr to r6
+    str r11, [r6]          // store the value to var
 
-//    ldr r0, =mode          // load address of mode to r0
-//    ldr r4, [r0]
+    // function ------------------------------
+    mov r12, r5             // save input param to local use
+    and r12, $0x00ff0000    // get byte 2: register
+    lsr r12, $16            // shift the bits to byte 0
 
-//    ldr r0, =pin
-//    ldr r5, [r0]
+    mov r11, r12
+    // Convert the value to ASCII to r11, just for debugging purpose
+    add r11, $48
+    ldr r6, =function       // load the var addr to r6
+    str r11, [r6]           // store the value to var
 
-//    ldr r0, =funct
-//    ldr r6, [r0]
+    mov r0, STDOUT_C
+    ldr r1, =str_mode         // address of text string
+    ldr r2, =strlen_mode // number of bytes to write
+    mov r7, SYS_WRITE_C
+    swi 0
 
-//    bl debug_print
+    mov r0, STDOUT_C
+    ldr r1, =mode
+    ldr r2, =strlen_nl
+    mov r7, SYS_WRITE_C
+    swi 0
+
+    mov r0, STDOUT_C
+    ldr r1, =str_nl
+    ldr r2, =strlen_nl
+    mov r7, SYS_WRITE_C
+    swi 0
+
+    mov r0, STDOUT_C
+    ldr r1, =str_pin
+    ldr r2, =strlen_pin
+    mov r7, SYS_WRITE_C
+    swi 0
+
+    mov r0, STDOUT_C
+    ldr r1, =pin
+    ldr r2, =strlen_nl
+    mov r7, SYS_WRITE_C
+    swi 0
+
+    mov r0, STDOUT_C
+    ldr r1, =str_nl
+    ldr r2, =strlen_nl
+    mov r7, SYS_WRITE_C
+    swi 0
+
+    mov r0, STDOUT_C
+    ldr r1, =str_function
+    ldr r2, =strlen_function
+    mov r7, SYS_WRITE_C
+    swi 0
+
+    mov r0, STDOUT_C
+    ldr r1, =function
+    ldr r2, =strlen_nl
+    mov r7, SYS_WRITE_C
+    swi 0
+
+    mov r0, STDOUT_C
+    ldr r1, =str_nl
+    ldr r2, =strlen_nl
+    mov r7, SYS_WRITE_C
+    swi 0
+
+//bl debug_print
+b end
+//    mov r1, r4
+//    add r4, r4, $48
+
+
+    mov r0, STDOUT_C
+    ldr r1, =str_nl         // address of text string
+    ldr r2, =strlen_nl      // number of bytes to write
+    mov r7, SYS_WRITE_C
+    swi 0
 
     cmp r10, $0              // checked if r4 == 0: GPFSEL0
     beq gpfsel0
@@ -219,8 +313,8 @@ begin:
 
 print_wrong_func_sel:
     mov r0, STDOUT_C
-    ldr r1, =msg_wrong_func_sel        // address of text string
-    ldr r2, =strlen_msg_wrong_func_sel // number of bytes to write
+    ldr r1, =str_wrong_func_sel        // address of text string
+    ldr r2, =strlen_str_wrong_func_sel // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
 
@@ -240,11 +334,12 @@ r6 = address, where mode selection bits will be shifted to
 */
 gpfsel0:
     mov r0, STDOUT_C
-    ldr r1, =msg_gpfsel0               // address of text string
-    ldr r2, =strlen_msg_func0_sel      // number of bytes to write
+    ldr r1, =str_pin                   // address of text string
+    ldr r2, =strlen_mode           // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
-    bl debug_print
+
+//    bl debug_print
 //    ldr r0, gpio_start_addr            // load GPIO start address
 //    mov r2, r4                         // mode value (for 'output' it is 001)
 
@@ -270,82 +365,83 @@ gpfsel0:
 
 
 //    mov r8, r4
-
     b end
+
 
 gpfsel1:
     mov r0, STDOUT_C
-    ldr r1, =msg_gpfsel1               // address of text string
-    ldr r2, =strlen_msg_func1_sel      // number of bytes to write
+    ldr r1, =str_gpfsel1               // address of text string
+    ldr r2, =strlen_str_func1_sel      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
     bl debug_print
     b end
 gpfsel2:
     mov r0, STDOUT_C
-    ldr r1, =msg_gpfsel2               // address of text string
-    ldr r2, =strlen_msg_func2_sel      // number of bytes to write
+    ldr r1, =str_gpfsel2               // address of text string
+    ldr r2, =strlen_str_func2_sel      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
     bl debug_print
     b end
 gpfsel3:
     mov r0, STDOUT_C
-    ldr r1, =msg_gpfsel3               // address of text string
-    ldr r2, =strlen_msg_func3_sel      // number of bytes to write
+    ldr r1, =str_gpfsel3               // address of text string
+    ldr r2, =strlen_str_func3_sel      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
     bl debug_print
     b end
 gpfsel4:
     mov r0, STDOUT_C
-    ldr r1, =msg_gpfsel4               // address of text string
-    ldr r2, =strlen_msg_func4_sel      // number of bytes to write
+    ldr r1, =str_gpfsel4               // address of text string
+    ldr r2, =strlen_str_func4_sel      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
     bl debug_print
     b end
 gpfsel5:
     mov r0, STDOUT_C
-    ldr r1, =msg_gpfsel5               // address of text string
-    ldr r2, =strlen_msg_func5_sel      // number of bytes to write
+    ldr r1, =str_gpfsel5               // address of text string
+    ldr r2, =strlen_str_func5_sel      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
     bl debug_print
     b end
 gpfset0:
     mov r0, STDOUT_C
-    ldr r1, =msg_gpfset0               // address of text string
-    ldr r2, =strlen_msg_func0_set      // number of bytes to write
+    ldr r1, =str_gpfset0               // address of text string
+    ldr r2, =strlen_str_func0_set      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
     bl debug_print
     b end
 gpfset1:
     mov r0, STDOUT_C
-    ldr r1, =msg_gpfset1               // address of text string
-    ldr r2, =strlen_msg_func1_set      // number of bytes to write
+    ldr r1, =str_gpfset1               // address of text string
+    ldr r2, =strlen_str_func1_set      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
     bl debug_print
     b end
 gpfclr0:
     mov r0, STDOUT_C
-    ldr r1, =msg_gpfclr0               // address of text string
-    ldr r2, =strlen_msg_func0_clr      // number of bytes to write
+    ldr r1, =str_gpfclr0               // address of text string
+    ldr r2, =strlen_str_func0_clr      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
     bl debug_print
     b end
 gpfclr1:
     mov r0, STDOUT_C
-    ldr r1, =msg_gpfclr1               // address of text string
-    ldr r2, =strlen_msg_func1_clr      // number of bytes to write
+    ldr r1, =str_gpfclr1               // address of text string
+    ldr r2, =strlen_str_func1_clr      // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
     bl debug_print
     b end
 end:
+    bl debug_print
     pop {pc}
 
 /*
