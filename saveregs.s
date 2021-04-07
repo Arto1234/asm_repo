@@ -7,9 +7,9 @@ Arto Rasimus 14.3.2021 */
 .syntax unified
 .section .rodata
 .align 2
-@ ---------------------------------------
-@       Data Section
-@ ---------------------------------------
+/* ---------------------------------------
+        Data Section
+ --------------------------------------- */
 
 .section .data
 str_function_name:
@@ -67,15 +67,9 @@ r12_save_addr:   .word  r12_save
 r13_save_addr:   .word  r13_save
 r14_save_addr:   .word  r14_save
 
-reg_val_addr:
-    .global reg_val_addr
-aux_reg_val:
-    .global aux_reg_val_addr
-
-
-@ ---------------------------------------
-@       Code Section
-@ ---------------------------------------
+/* ---------------------------------------
+        Code Section
+ --------------------------------------- */
 .section .text
 .align 2
 .global saveregs
