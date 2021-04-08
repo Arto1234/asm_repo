@@ -12,3 +12,34 @@ gpio_mem_map_init.s Initialisation of gpiomem device. Used from another reposito
 read_input.s        Function reads one 32-bit value (8 hex characters) from stdin. Used by GPIO mode selection        (IN: r1)   OUT: r5
                     in function gpio_input.
 gpio_mode_select.s  Function initialises Raspberry Pi 3's selected GPIO pins for selected function.                    IN: r5
+                    ---------------------------------------------
+                    |  unused  | function |  pin nr  |   mode   |
+                    ---------------------------------------------
+                    r5 byte 0: mode select
+                    r8
+                    000 = GPIO Pin x is an input
+                    001 = GPIO Pin x is an output
+                    100 = GPIO Pin x takes alternate function 0
+                    101 = GPIO Pin x takes alternate function 1
+                    110 = GPIO Pin x takes alternate function 2
+                    111 = GPIO Pin x takes alternate function 3
+                    011 = GPIO Pin x takes alternate function 4
+                    010 = GPIO Pin x takes alternate function 5
+
+                    r5 byte 1: pin number within tens group
+                    r9 = 0..9
+                    pin number in the section will be processed
+                    e.g. pin 6: bits 20 19 18 will be processed.
+
+                    r5 byte 2: tens group
+                    r12
+                    r12 = 0,  GPFSEL0 will be processed
+                    r12 = 1,  GPFSEL1
+                    r12 = 2,  GPFSEL2
+                    r12 = 3,  GPFSEL3
+                    r12 = 4,  GPFSEL4
+                    r12 = 5,  GPFSEL5
+
+                    r0 = base address 0x3F200000
+                    r6 = offset from base address
+
