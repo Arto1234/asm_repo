@@ -18,8 +18,9 @@ str_function_name:
 //    .file:  .ascii          "/dev/mem\000"
 .file:    .ascii          "/dev/gpiomem\000"
 
-retval:   .word
-
+mmap_retval:   .word
+.global mmap_retval
+mmap_retval_addr:    .word   mmap_retval
 
 /* ---------------------------------------
         Code Section
@@ -48,25 +49,27 @@ gpio_mem_init:
 
 open_file:
     push {r1-r3, lr}
-    ldr r0, .addr_file                  // get /dev/mem file for virtual file addr
-    ldr r1, .flags                      // set flag permissions         // rw - r
-    bl open                             // calls open; returns file handle in r0
+    ldr r0, .addr_file              // get /dev/mem file for virtual file addr
+    ldr r1, .flags                  // set flag permissions         // rw - r
+    bl open                         // calls open; returns file handle in r0
     pop {r1-r3, pc}
 
 map_file:
     push {r1-r3, lr}
-    str r0, [sp, #0]                    // store returned file handle to 4th level of stack
-    ldr r3, [sp, #0]                    // copy file handle to r3
-    // parameters for mmap              // nmap will map files or devices into memory
-    str r3, [sp, #0]                    // copy file handle to 1st level of stack for mmap
-    ldr r3, .gpiobase                   // GPIO base address
-    str r3, [sp, #4]                    // store GPIO base to 2nd level of stack for mmap
-    mov r0, #0                          // null address - let the kernel choose the address
+    str r0, [sp, #0]                // store returned file handle to 4th level of stack
+    ldr r3, [sp, #0]                // copy file handle to r3
+    // parameters for mmap          // nmap will map files or devices into memory
+    str r3, [sp, #0]                // copy file handle to 1st level of stack for mmap
+    ldr r3, .gpiobase               // GPIO base address
+    str r3, [sp, #4]                // store GPIO base to 2nd level of stack for mmap
+    mov r0, #0                      // null address - let the kernel choose the address
     mov r1, PAGE_SIZE_C
-    mov r2, #3                          // desired memory protection type ???
+    mov r2, #3                      // desired memory protection type ???
     mov r3, #1
-    bl mmap                             // call mmap; returns kernel mapped addr in r0
+    bl mmap                         // call mmap; returns kernel mapped addr in r0
 
+    ldr r10, =mmap_retval           // Load address for the global variable to some reg (r10)
+    str r0, [r10]                   // Save r0 to global variable
     pop {r1-r3, pc}
 
 
