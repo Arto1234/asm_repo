@@ -1,7 +1,5 @@
-/* Function copied from:
-   https://github.com/InfinitelyManic/Raspberry-Pi-2/blob/master/gpio_init_test_via_mmap.s
-   This function is run under userland, therefore used gpiomem device.
-   For bare metal usage, mem device. */
+/* This function is run under userland, therefore used gpiomem device.
+   For bare metal approach, mem device must be used. */
 .cpu cortex-a53
 .fpu neon-fp-armv8
 .syntax unified
@@ -15,10 +13,9 @@ str_function_name:
     .asciz "gpio_mem_init()\n"
     strlen_function_name = .-str_function_name
 
-//    .file:  .ascii          "/dev/mem\000"
-.file:    .ascii          "/dev/gpiomem\000"
+gpiomem:    .asciz          "/dev/gpiomem"
 
-mmap_retval:   .word
+mmap_retval:   .word  0x12345678
 .global mmap_retval
 mmap_retval_addr:    .word   mmap_retval
 
@@ -28,11 +25,17 @@ mmap_retval_addr:    .word   mmap_retval
 .section .text
 .align 2
 
-.equ STDOUT_C,     0x1
-.equ SYS_WRITE_C,  0x4
-.equ PAGE_SIZE_C,  0x4096
-.equ FLAGS_C,      06010002
-.equ GPIO_BASE_C,  0x3F200000
+.equ STDOUT_C,      0x1
+.equ SYS_WRITE_C,   0x4
+.equ PAGE_SIZE_C,   0x4096
+.equ FLAGS_C,       0x101002
+//.equ GPIO_BASE_C,   0x3F200000
+.equ OPEN_C,        5
+.equ PROT_RW_C,     3
+.equ MAP_SHARED_C,  1
+.equ MMAP2_C,       192
+//.equ EXIT_C,        248
+.equ RET_SUCCESS_C, 0
 
 .global gpio_mem_init
 .type gpio_mem_init, %function
@@ -43,40 +46,27 @@ gpio_mem_init:
     mov r7, SYS_WRITE_C
     swi 0
 
-    .addr_file:     .word   .file          // pointer to .file
-    .flags:         .word   FLAGS_C        // rw . x       // 0x181002
-    .gpiobase:      .word   GPIO_BASE_C    // base address for BCM2836
-
-open_file:
-    push {r1-r3, lr}
-    ldr r0, .addr_file              // get /dev/mem file for virtual file addr
-    ldr r1, .flags                  // set flag permissions         // rw - r
-    bl open                         // calls open; returns file handle in r0
-    pop {r1-r3, pc}
-
 map_file:
-    push {r1-r3, lr}
-    str r0, [sp, #0]                // store returned file handle to 4th level of stack
-    ldr r3, [sp, #0]                // copy file handle to r3
-    // parameters for mmap          // nmap will map files or devices into memory
-    str r3, [sp, #0]                // copy file handle to 1st level of stack for mmap
-    ldr r3, .gpiobase               // GPIO base address
-    str r3, [sp, #4]                // store GPIO base to 2nd level of stack for mmap
-    mov r0, #0                      // null address - let the kernel choose the address
-    mov r1, PAGE_SIZE_C
-    mov r2, #3                      // desired memory protection type ???
-    mov r3, #1
-    bl mmap                         // call mmap; returns kernel mapped addr in r0
+    ldr     r0, =gpiomem
+    ldr     r1, =FLAGS_C    // O_RDWR | O_SYNC
+    mov     r7, OPEN_C      // open
+    svc     #0
+    mov     r4, r0          // file descriptor
+
+    mov     r0, #0          // kernel chooses address
+    mov     r1, PAGE_SIZE_C // map size
+    mov     r2, PROT_RW_C   // PROT_READ | PROT_WRITE
+    mov     r3, MAP_SHARED_C// MAP_SHARED
+    mov     r5, #0          // offset
+    mov     r7, MMAP2_C     // mmap2
+    svc     #0
+
+    mov     r0, #0          // return code
+//  mov     r7, EXIT_C      // exit
+//  svc     #0
 
     ldr r10, =mmap_retval           // Load address for the global variable to some reg (r10)
     str r0, [r10]                   // Save r0 to global variable
-    pop {r1-r3, pc}
 
 
-close_file:                             // params for file close
-    push {r1-r3, lr}
-
-    ldr r0, [sp, #0]                    // get file handle
-
-    bl close
-    pop {r1-r3, pc}
+    bx lr
