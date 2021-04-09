@@ -15,7 +15,7 @@ Arto Rasimus 20.3.2021 */
 .section .data
 
 str_function_name:
-    .asciz "\n\ndebug_print()\n"
+    .asciz "debug_print()\n"
     strlen_function_name = .-str_function_name
 str_r0:
     .ascii "GP r0  = 0x"
