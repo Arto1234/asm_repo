@@ -82,6 +82,10 @@ str_gpfclr1:
     .asciz "GPIO CLR function 1 selected\n"    // 11
     strlen_str_func1_clr = .-str_gpfclr1
 
+str_address:
+    .asciz "GPIO address = "
+    strlen_address = .-str_address
+
 str_function:
     .asciz "function = "
     strlen_function = .-str_function
@@ -97,6 +101,9 @@ str_mode:
 str_wrong_func_sel:
     .asciz "Wrong function selected\n"
     strlen_str_wrong_func_sel = .-str_wrong_func_sel
+
+GPIO_BASE_C: .word 0x3F200000 // base address for BCM2836
+gpio_base: .word GPIO_BASE_C
 
 /* -------------------------------------
         Block Starting Symbol Section
@@ -119,7 +126,6 @@ str_wrong_func_sel:
 .equ SYS_WRITE_C,  0x4
 .equ STATUS_OK_C,  0x71 // Return value from check_hex_digit()
 .equ STATUS_NOK_C, 0x82 // Return value from check_hex_digit()
-.equ GPIO_BASE_C,  0x3F200000
 
 .equ GPFSEL0_OFFSET_C, 0x00 // pins  0.. 9 function selection
 .equ GPFSEL1_OFFSET_C, 0x04 // pins 10..19 function selection
@@ -326,10 +332,12 @@ gpfsel0:
     add r9, r9, r9, lsl $1          // r9 * 3.  r9 = r9 + (r9 << 1)
     lsl r8, r9                      // mode bits are shifted left (3 x pin_nr)
 
+    // global variable that is set in gpio_mem_map_init.s / gpio_mem_init()
+    ldr r0, =mmap_retval
     mov r2, GPFSEL0_OFFSET_C        // function offset
-    add r2, r0, r2                  // target address = base + function offset
+    add r3, r0, r2                  // target address = base + function offset
 
-    // TODO: move the mode bits to correct location
+    b end
 
 gpfsel1:
     mov r0, STDOUT_C
@@ -343,11 +351,13 @@ gpfsel1:
     add r9, r9, r9, lsl $1          // r9 * 3.  r9 = r9 + (r9 << 1)
     lsl r8, r9                      // mode bits are shifted left (3 x pin_nr)
 
+    /* Stored variable used here, because original r0 value
+       (from mmap init) was destroyed by previous commands */
+    ldr r0, =mmap_retval
     mov r2, GPFSEL1_OFFSET_C        // function offset
-    add r2, r0, r2                  // target address = base + function offset
 
-    // TODO: move the mode bits to correct location
-
+    // Access GPIOs via r0
+    str r8, [r0, GPFSEL1_OFFSET_C]  // Write r8 value to GPIO
     b end
 
 gpfsel2:
@@ -362,62 +372,164 @@ gpfsel2:
     add r9, r9, r9, lsl $1          // r9 * 3.  r9 = r9 + (r9 << 1)
     lsl r8, r9                      // mode bits are shifted left (3 x pin_nr)
 
+    /* Stored variable used here, because original r0 value
+       (from mmap init) was destroyed by previous commands */
+    ldr r0, =mmap_retval
     mov r2, GPFSEL2_OFFSET_C        // function offset
-    add r2, r0, r2                  // target address = base + function offset
 
-    // TODO: move the mode bits to correct location
-
+    // Access GPIOs via r0
+    str r8, [r0, GPFSEL2_OFFSET_C]  // Write r8 value to GPIO
     b end
+
 gpfsel3:
     mov r0, STDOUT_C
     ldr r1, =str_gpfsel3            // address of text string
     ldr r2, =strlen_str_func3_sel   // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
+
+    // 3 * pin_nr: to the place of correct bit
+    // r9: pin_nr * 3 is the amount by which the 3 mode bits are shifted
+    add r9, r9, r9, lsl $1          // r9 * 3.  r9 = r9 + (r9 << 1)
+    lsl r8, r9                      // mode bits are shifted left (3 x pin_nr)
+
+    /* Stored variable used here, because original r0 value
+       (from mmap init) was destroyed by previous commands */
+    ldr r0, =mmap_retval
+    mov r2, GPFSEL3_OFFSET_C        // function offset
+
+    // Access GPIOs via r0
+    str r8, [r0, GPFSEL3_OFFSET_C]  // Write r8 value to GPIO
     b end
+
 gpfsel4:
     mov r0, STDOUT_C
     ldr r1, =str_gpfsel4            // address of text string
     ldr r2, =strlen_str_func4_sel   // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
+
+    // 3 * pin_nr: to the place of correct bit
+    // r9: pin_nr * 3 is the amount by which the 3 mode bits are shifted
+    add r9, r9, r9, lsl $1          // r9 * 3.  r9 = r9 + (r9 << 1)
+    lsl r8, r9                      // mode bits are shifted left (3 x pin_nr)
+
+    /* Stored variable used here, because original r0 value
+       (from mmap init) was destroyed by previous commands */
+    ldr r0, =mmap_retval
+    mov r2, GPFSEL4_OFFSET_C        // function offset
+
+    // Access GPIOs via r0
+    str r8, [r0, GPFSEL4_OFFSET_C]  // Write r8 value to GPIO
     b end
+
 gpfsel5:
     mov r0, STDOUT_C
     ldr r1, =str_gpfsel5            // address of text string
     ldr r2, =strlen_str_func5_sel   // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
+
+    // 3 * pin_nr: to the place of correct bit
+    // r9: pin_nr * 3 is the amount by which the 3 mode bits are shifted
+    add r9, r9, r9, lsl $1          // r9 * 3.  r9 = r9 + (r9 << 1)
+    lsl r8, r9                      // mode bits are shifted left (3 x pin_nr)
+
+    /* Stored variable used here, because original r0 value
+       (from mmap init) was destroyed by previous commands */
+    ldr r0, =mmap_retval
+    mov r2, GPFSEL5_OFFSET_C        // function offset
+
+    // Access GPIOs via r0
+    str r8, [r0, GPFSEL5_OFFSET_C]  // Write r8 value to GPIO
     b end
+
 gpfset0:
     mov r0, STDOUT_C
     ldr r1, =str_gpfset0            // address of text string
     ldr r2, =strlen_str_func0_set   // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
+
+    // 3 * pin_nr: to the place of correct bit
+    // r9: pin_nr * 3 is the amount by which the 3 mode bits are shifted
+    add r9, r9, r9, lsl $1          // r9 * 3.  r9 = r9 + (r9 << 1)
+    lsl r8, r9                      // mode bits are shifted left (3 x pin_nr)
+
+    /* Stored variable used here, because original r0 value
+       (from mmap init) was destroyed by previous commands */
+    ldr r0, =mmap_retval
+    mov r2, GPFSET0_OFFSET_C        // function offset
+
+    // Access GPIOs via r0
+    str r8, [r0, GPFSET0_OFFSET_C]  // Write r8 value to GPIO
     b end
+
 gpfset1:
     mov r0, STDOUT_C
     ldr r1, =str_gpfset1            // address of text string
     ldr r2, =strlen_str_func1_set   // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
+
+    // 3 * pin_nr: to the place of correct bit
+    // r9: pin_nr * 3 is the amount by which the 3 mode bits are shifted
+    add r9, r9, r9, lsl $1          // r9 * 3.  r9 = r9 + (r9 << 1)
+    lsl r8, r9                      // mode bits are shifted left (3 x pin_nr)
+
+    /* Stored variable used here, because original r0 value
+       (from mmap init) was destroyed by previous commands */
+    ldr r0, =mmap_retval
+    mov r2, GPFSET1_OFFSET_C        // function offset
+
+    // Access GPIOs via r0
+    str r8, [r0, GPFSET1_OFFSET_C]  // Write r8 value to GPIO
     b end
+
 gpfclr0:
     mov r0, STDOUT_C
     ldr r1, =str_gpfclr0            // address of text string
     ldr r2, =strlen_str_func0_clr   // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
+
+    // 3 * pin_nr: to the place of correct bit
+    // r9: pin_nr * 3 is the amount by which the 3 mode bits are shifted
+    add r9, r9, r9, lsl $1          // r9 * 3.  r9 = r9 + (r9 << 1)
+    lsl r8, r9                      // mode bits are shifted left (3 x pin_nr)
+
+    /* Stored variable used here, because original r0 value
+       (from mmap init) was destroyed by previous commands */
+    ldr r0, =mmap_retval
+    mov r2, GPFCLR0_OFFSET_C        // function offset
+
+    // Access GPIOs via r0
+    str r8, [r0, GPFCLR0_OFFSET_C]  // Write r8 value to GPIO
     b end
+
 gpfclr1:
     mov r0, STDOUT_C
     ldr r1, =str_gpfclr1            // address of text string
     ldr r2, =strlen_str_func1_clr   // number of bytes to write
     mov r7, SYS_WRITE_C
     swi 0
+
+    // 3 * pin_nr: to the place of correct bit
+    // r9: pin_nr * 3 is the amount by which the 3 mode bits are shifted
+    add r9, r9, r9, lsl $1          // r9 * 3.  r9 = r9 + (r9 << 1)
+    lsl r8, r9                      // mode bits are shifted left (3 x pin_nr)
+
+    /* Stored variable used here, because original r0 value
+       (from mmap init) was destroyed by previous commands */
+    ldr r0, =mmap_retval
+    mov r2, GPFCLR1_OFFSET_C        // function offset
+
+    // Access GPIOs via r0
+    str r8, [r0, GPFCLR1_OFFSET_C]  // Write r8 value to GPIO
     b end
+
 end:
+    bl debug_print
     pop {pc}
 
 /*
