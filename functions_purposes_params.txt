@@ -11,6 +11,8 @@ saveregs.s          Function saves registers' contents to global variables. Used
 gpio_mem_map_init.s Initialisation of gpiomem device. Used from another repository.                                    
 read_input.s        Function reads one 32-bit value (8 hex characters) from stdin. Used by GPIO mode selection        (IN: r1)   OUT: r5
                     in function gpio_input.
+read_cfg_line.s     Function reads one 32-bit value (8 hex characters) from file gpio_config_cfg. Used by GPIO mode selection
+                    in function gpio_input.                                                                           (IN: r1)   OUT: r5
 gpio_mode_select.s  Function initialises Raspberry Pi 3's selected GPIO pins for selected function.                    IN: r5
                     ---------------------------------------------
                     |  unused  | function |  pin nr  |   mode   |
