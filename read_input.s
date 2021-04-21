@@ -2,7 +2,7 @@
 This function reads one 32-bit value (8 hex characters) from stdin.
 Digits must be in hex. Value range: 00000000..FFFFFFFF.
 It reads input and returns it to _start.
-Value is returned in r3 as 32-bit hex value.
+Value is returned in r5 as 32-bit hex value.
 
 TODO: reading from parameter file or fixed constant data.
 Arto Rasimus 31.3.2021 */
@@ -92,7 +92,7 @@ loop:
     mul r6, r6, r8       // counter * 4 = left shift in bits
 
     lsl r4, r3, r6       // r3 is left shifted by ctr * 4 bits, to r4
-    orr r5, r4           // bit pattern is placed intofinal result
+    orr r5, r4           // bit pattern is placed into final result
 
     sub r2, $1           // decrement the char counter
     cmp r2, $0
@@ -100,6 +100,7 @@ loop:
     b value_ok
 
 value_ok:
+bl debug_print
     mov r3, STATUS_OK_C
     b end
 
