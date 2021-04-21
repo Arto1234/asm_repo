@@ -1,6 +1,7 @@
 clear
 as -c main.s -o main.o
-as -c read_input.s -o read_input.o
+as -c read_cfg_line.s -o read_cfg_line.o
+#as -c read_input.s -o read_input.o
 as -c gpio_mode_select.s -o gpio_mode_select.o
 as -c print_char.s -o print_char.o
 as -c saveregs.s -o saveregs.o
@@ -9,7 +10,7 @@ as -c debug_print.s -o debug_print.o
 as -c gpio_mem_map_init.s -o gpio_mem_map_init.o
 ld -o main /usr/lib/arm-linux-gnueabihf/libc.so \
   main.o \
-  read_input.o \
+  read_cfg_line.o \
   gpio_mode_select.o \
   print_char.o \
   saveregs.o \
