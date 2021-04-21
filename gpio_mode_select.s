@@ -1,7 +1,7 @@
 /* gpio_mode_select.s
 This function initialises Raspberry Pi 3's
 selected GPIO pins for selected function.
-Command will be given in r4 for every GPIO pin individually.
+Command will be given in r5 for every GPIO pin individually.
 
 Input param: r5
 ---------------------------------------------
@@ -164,6 +164,7 @@ gpio_mode_select:
     mov r7, SYS_WRITE_C
     swi 0
 
+//bl debug_print
 begin:
 /* Input param: r5
 --------------------------------------------
@@ -205,7 +206,7 @@ r10 is used by read_input(), therefore r10 is not used here. */
     ldr r6, =function        // load the var addr to r6
     str r11, [r6]            // store the value to var
 
-/*
+
     mov r0, STDOUT_C
     ldr r1, =str_mode        // address of text string
     ldr r2, =strlen_mode     // number of bytes to write
@@ -260,12 +261,6 @@ r10 is used by read_input(), therefore r10 is not used here. */
     mov r7, SYS_WRITE_C
     swi 0
 
-    mov r0, STDOUT_C
-    ldr r1, =str_nl         // address of text string
-    ldr r2, =strlen_nl      // number of bytes to write
-    mov r7, SYS_WRITE_C
-    swi 0
-*/
     cmp r12, $0              // checked if r12 == 0: GPFSEL0
     beq gpfsel0
 
@@ -529,7 +524,13 @@ gpfclr1:
     b end
 
 end:
-    bl debug_print
+//    bl debug_print
+    mov r0, STDOUT_C
+    ldr r1, =str_nl         // address of text string
+    ldr r2, =strlen_nl      // number of bytes to write
+    mov r7, SYS_WRITE_C
+    swi 0
+
     pop {pc}
 
 /*
