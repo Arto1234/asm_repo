@@ -30,18 +30,28 @@ message2:
 .section .text
 .align 2
 
+.equ STDOUT_C,     0x1
+.equ SYS_EXIT_C,   0x1
+.equ SYS_WRITE_C,  0x4
+.equ EOF_C,        999
+
 .global _start
 .type _start, %function
 _start:
-    mov r0, $1                    // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_function_name    // address of text string
     ldr r2, =strlen_function_name // number of bytes to write
-    mov r7, $4                    // SYS_WRITE = 4
+    mov r7, SYS_WRITE_C
     swi 0
 
-    bl gpio_mem_init  // returns kernel mapped addr in r0
-    bl read_input     // returns value is stored in r4
-    bl gpio_mode_select
+    bl gpio_mem_init     // kernel mapped address is returned in mmap_retval variable
+loop:
+//    bl read_input        // return value is stored in r5
+    bl read_cfg_file_row   // return value is stored in r5
+    bl gpio_mode_select    // receives modeset value in r5
+    ldr r8, =0x99999999    // EOF
+    cmp r5,  r8
+//    bne loop
 
 
 /*
@@ -64,15 +74,14 @@ end_msg:
     cmp r5, $0        // compared the given value (from sub routine)
     bgt end
 
-    mov r0, $1        // syscall
+    mov r0, $1        // stdout
     ldr r1, =message2 // address of text string
     ldr r2, =len_msg2 // number of bytes to write
-    mov r7, $4        // SYS_WRITE = 4
+    mov r7, $4        // SYS_WRITE
     swi 0
 
 end:
 */
-    // STDOUT_FILENO is 1
     mov r0, $0        // exit with 0 exit code
-    mov r7, $1        // SYS_EXIT
+    mov r7, SYS_EXIT_C
     swi 0             // SW interrupt
