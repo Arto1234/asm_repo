@@ -1,5 +1,5 @@
 /* This function is run under userland, therefore used gpiomem device.
-   For bare metal approach, mem device must be used. */
+   For bare metal approach, /dev/mem device must be used. */
 .cpu cortex-a53
 .fpu neon-fp-armv8
 .syntax unified
@@ -50,9 +50,9 @@ map_file:
     ldr     r0, =gpiomem
     ldr     r1, =FLAGS_C    // O_RDWR | O_SYNC
     mov     r7, OPEN_C      // open
-    svc     #0
-    mov     r4, r0          // file descriptor
+    svc     $0
 
+    mov     r4, r0          // file descriptor
     mov     r0, #0          // kernel chooses address
     mov     r1, PAGE_SIZE_C // map size
     mov     r2, PROT_RW_C   // PROT_READ | PROT_WRITE
