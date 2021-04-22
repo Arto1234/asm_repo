@@ -31,7 +31,7 @@ str_x:
 .align 2
 
 .equ STDOUT_C,     0x1
-.equ SYS_WRITE_C,  0x4
+.equ WRITE_C,      0x4
 
 .global print_char
 .type print_char, %function
@@ -125,10 +125,10 @@ print_hex_digit:
     str r10, [r8]          /* address of r9 (i.e. start of the string)
                              used for storing the ASCII char number */
 
-    mov r0, $1             // syscall
+    mov r0, STDOUT_C
     ldr r1, =str_x         // address of text string
     ldr r2, =strlen_x      // number of bytes to write
-    mov r7, $4             // SYS_WRITE = 4
+    mov r7, WRITE_C
     swi 0
 
     sub r11, $1            // loop_count -= 1
@@ -147,7 +147,7 @@ print_space:
     mov r0, STDOUT_C
     ldr r1, =str_x         // address of text string
     ldr r2, =strlen_x      // number of bytes to write
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
     b loop
 
@@ -160,7 +160,7 @@ nl:
     mov r0, STDOUT_C
     ldr r1, =str_x         // address of text string
     ldr r2, =strlen_x      // number of bytes to write
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
 end:
