@@ -33,12 +33,16 @@ str_err_file_open_failed:
     strlen_err_file_open_failed = .-str_err_file_open_failed
 
 str_err_read_error:
-    .asciz "cfg parameter out of limits error\n"
+    .asciz "\ncfg parameter out of limits error\n"
     strlen_err_read_error = .-str_err_read_error
 
 str_buf:             // for debugging purposes
     .ascii "buf = "
     strlen_buf = .-str_buf
+
+str_dummy:             // for debugging purposes
+    .ascii "dummy = "
+    strlen_dummy = .-str_dummy
 
 str_rows_read:             // for debugging purposes
     .ascii "rows_read = "
@@ -47,6 +51,10 @@ str_rows_read:             // for debugging purposes
 str_nl:              // for debugging purposes
     .asciz "\n"
     strlen_nl = .-str_nl
+
+str_xnl:              // for debugging purposes
+    .asciz "label X\n"
+    strlen_xnl = .-str_xnl
 
 cfg_file_name:       .asciz "gpio_config.cfg"
 
@@ -118,13 +126,14 @@ read_cfg_file_row:
     mov r7, WRITE_C
     svc $0
 
-    // Open the configuration text file, read-only
     ldr r0, =file_rows_read
     ldr r0, [r0]
-    cmp r0, $0         // nothing read yet, so open the file for reading
-    beq open_file
-    b read_next
+    cmp r0, $0          // if nothing has been read yet, open the file for reading
+//    beq open_file
+//    b open_file
+//    b read_next
 
+    // Open the configuration text file, read-only
 open_file:
     ldr r0, =cfg_file_name
     mov r1, O_RDONLY_C
@@ -146,7 +155,6 @@ open_file:
     ldr r2, =strlen_file_opened
     mov r7, WRITE_C
     svc $0
-//b end
 
 read_next:
     ldr r0, =file_descriptor
@@ -156,7 +164,6 @@ read_next:
     mov r7, READ_C
     svc $0
 
-/*
     mov r0, STDOUT_C
     ldr r1, =str_buf    // address of text string
     ldr r2, =strlen_buf // number of bytes to write
@@ -169,18 +176,24 @@ read_next:
     mov r7, WRITE_C
     svc $0
 
+/*
     mov r0, STDOUT_C
     ldr r1, =str_nl
     mov r2, $2
     mov r7, WRITE_C
     svc $0
+
+    mov r0, STDOUT_C
+    ldr r1, =str_dummy    // address of text string
+    ldr r2, =strlen_dummy // number of bytes to write
+    mov r7, WRITE_C
+    svc $0
 */
 
-    mov r2, $8                // counter
-    mov r5, $0                // status
-    mov r9, r1                // r9 used as temporary storage
-    sub r2, $1                // r2: character amount (8) --> loop counter (7..0)
-    mov r8, NIBBLE_LEN_C      // Multiplier (4). Size of hex digit in bits.
+    mov r9, r1
+    mov r5, $0
+    sub r2, $1           // r2: character amount (8) --> loop counter (7..0)
+    mov r8, NIBBLE_LEN_C // Multiplier (4). Size of hex digit.
 
 loop:
     // r6 = counter * 4 (bit shift index)
@@ -199,43 +212,50 @@ loop:
     sub r2, $1           // decrement the char counter
     cmp r2, $0
     bge loop
-    b value_ok
-//   b line_loop
 
+//    b value_ok
+    b dummy
 
-line_loop:
-    ldr r0, =cfg_file_name
+dummy:
+    ldr r0, =file_descriptor
+    ldr r0, [r0]
     ldr r1, =file_read_dummy_char
-    mov r2, $1     // one character read until EOL
+    mov r2, $1
     mov r7, READ_C
     svc $0
-/*
-    mov r0, STDOUT_C
-    mov r1, $65//file_read_dummy_char
-    mov r2, $1     // one character read until EOL
-    mov r7, WRITE_C
-    svc $0
 
-    // if not 0xA
-    cmp r1, $65
-*/
-//    bne line_loop   // if CR was not read then read next character
+    ldr r1, [r1]
+    cmp r1, 0x0A    // CR
+    bne dummy       // characters are read from line until CR found
 
-    b increment_rows_read_ctr // rows += 1
+//    b increment_rows_read_ctr // rows += 1
 
 
 increment_rows_read_ctr:
     ldr r0, =file_rows_read // variable addrss
     ldr r1, [r0]            // read its value
     add r1, r1, $1          // increment the counter of the read rows
-//    ldr r2, =file_rows_read
     str r1, [r0]            // Save value to the global variable
 
-//    b read_next
+    mov r9, r1              // save the row counter value before NL print overwrites r1
+    mov r0, STDOUT_C
+    ldr r1, =str_nl
+    mov r2, $2
+    mov r7, WRITE_C
+    svc $0
+
+    mov r1, r9              // restore r1
+    ldr r11, =0x99999999    // end mark
+    cmp r5, r11
+    bne read_next
+    subs r1, $1
+    bl debug_print
+    mov r3, STATUS_OK_C
+    b end
 
 value_ok:
     mov r3, STATUS_OK_C
-    b end
+
 
 // parameter length <> 8 chars
 wrong_parameter_length:
@@ -250,6 +270,7 @@ out_of_limits:
     svc $0
 
     mov r3, STATUS_NOK_C
+    b end
 
 file_open_failed:
     mov r3, STATUS_NOK_C
@@ -257,6 +278,37 @@ file_open_failed:
     mov r0, STDOUT_C
     ldr r1, =str_err_file_open_failed
     mov r2, strlen_err_file_open_failed
+    mov r7, WRITE_C
+    svc $0
+
+
+print_rows_read:
+    // debug print the row counter
+    mov r0, STDOUT_C
+    ldr r1, =str_rows_read
+    ldr r2, =strlen_rows
+    mov r7, WRITE_C
+    svc $0
+
+    mov r0, STDOUT_C
+    ldr r1, =file_rows_read  // address
+    ldr r1, [r1]             // current value
+    add r1, r1, $30
+    mov r4, r9             // store updated value to variable
+    mov r2, $5
+    svc $0
+
+    mov r0, STDOUT_C
+//    ldr r1, =file_rows_read
+//    add r1, $1
+/*ldr r1, =$65
+    mov r2, $2               // nr of characters
+    mov r7, WRITE_C
+    svc $0
+*/
+    mov r0, STDOUT_C
+    ldr r1, =str_nl
+    mov r2, $2
     mov r7, WRITE_C
     svc $0
 
@@ -271,31 +323,7 @@ end:
     mov r7, WRITE_C
     svc $0
 
-    // debug print the row counter
-    mov r0, STDOUT_C
-    ldr r1, =str_rows_read
-    ldr r2, =strlen_rows
-    mov r7, WRITE_C
-    svc $0
-
-    // debug print the row counter
-    mov r0, STDOUT_C
-    ldr r1, =file_rows_read
-
-/*
-print_rows_read:
-    str r2, [r1]
-    mov r2, $2
-    mov r7, WRITE_C
-    svc $0
-
-    mov r0, STDOUT_C
-    ldr r1, =str_nl
-    mov r2, $2
-    mov r7, WRITE_C
-    svc $0
-*/
-
+//bl debug_print
     /* This creates side effect with above loop:
        r8:  var addr
        r9:  out (to print_char)
