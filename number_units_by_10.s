@@ -5,7 +5,7 @@ This function reads 32 bit value from r5 and returns
      100s in variable: value_100s
     1000s in variable: value_1000s
    10000s in variable: value_10000s
-Arto Rasimus 25.4.2021 */
+Arto Rasimus 27.4.2021 */
 .cpu cortex-a53
 .fpu neon-fp-armv8
 .syntax unified
@@ -77,18 +77,18 @@ number_units_by_10:
     // Precondition: R0 % R1 is the required computation
     // Postcondition: R0 has the result of R0 % R1
     //              : R2 has R0 / R1
-    mov r0, r5              // r5: the value to be divided
     mov r1, $10             // divisor
+//    mov r0, r5              // r5: the value to be divided
     udiv r2, r5, r1         // division <- a / b       ; r2 <- r0 / r1
-    mls  r0, r1, r2, r0     // modulo <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
+    mls  r0, r1, r2, r5     // modulo <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
 
     ldr r8, =value_1s        // Load address for the global variable to some reg (r8)
     str r0, [r8]             // Save units to the global variable
 
     // division and modulo by 10:
+    mov r1, $10             // divisor
     udiv r6, r5, r1         // division <- a / b       ; r2 <- r0 / r1
     mov r0, r6              // r5: the value to be divided
-    mov r1, $10             // divisor
     udiv r2, r0, r1         // division <- a / b       ; r3 <- r0 / r1
     mls  r0, r1, r2, r0     // modulo <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
 
@@ -103,21 +103,53 @@ number_units_by_10:
     udiv r2, r6, r1         // division <- a / b       ; r2 <- r0 / r1
     mls  r0, r1, r2, r0      // result2 <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
 
+    cmp r0, $9
+    bgt zero_100s
+
+l_10:
     ldr r8, =value_100s      // Load address for the global variable to some reg (r8)
     str r0, [r8]             // Save 100s to the global variable
 
     // divide by 1000:
     ldr r1, =$1000           // division and modulo by 1000
-    udiv r6, r5, r1         // division <- a / b       ; r2 <- r0 / r1
-    mov r0, r6              // r5: the value to be divided
+    udiv r6, r5, r1          // division <- a / b       ; r2 <- r0 / r1
+    mov r0, r6               // r5: the value to be divided
 
     udiv r2, r0, r1          // result1 <- a / b       ; r2 <- r0 / r1
     mls  r0, r1, r2, r0      // result2 <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
 
+    cmp r0, $9
+    bgt zero_100s
+
+l_100:
     ldr r8, =value_1000s     // Load address for the global variable to some reg (r8)
     str r0, [r8]             // Save 1000s to the global variable
 
     b end
+
+zero_10s:
+    mov r1, $10             // division and modulo by 10
+    udiv r2, r0, r1         // division <- a / b       ; r2 <- r0 / r1
+    ldr r1, =$100           // division and modulo by 100
+    mls  r0, r1, r2, r0     // result2 <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
+    b l_10
+
+zero_100s:
+    mov r1, $10             // division and modulo by 10
+//    udiv r2, r0, r1         // division <- a / b       ; r2 <- r0 / r1
+//    ldr r1, =$100           // division and modulo by 100
+    mls  r0, r1, r2, r0     // result2 <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
+bl debug_print
+
+//bl debug_print
+    b l_100
+
+zero_1000s:
+    mov r1, $100             // division and modulo by 10
+    udiv r2, r0, r1         // division <- a / b       ; r2 <- r0 / r1
+    ldr r1, =$1000           // division and modulo by 100
+    mls  r0, r1, r2, r0     // result2 <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
+    b l_100
 
 value_ok:
     mov r0, STDOUT_C
