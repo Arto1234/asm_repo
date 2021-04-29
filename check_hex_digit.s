@@ -4,8 +4,8 @@ In:  ASCII, r10 ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                  'A', 'B', 'C', 'D', 'E', 'F', 'a', 'b', 'c', 'd', 'e', 'f'
 Out: hex conversion, r3 (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
 Out: status: r10
-Conversion OK, status 0 in r10
-Conversion not valid: status 999 in r10
+Conversion OK, status 0x71 in r10
+Conversion not valid: status 0x82 in r10
 Arto Rasimus 30.3.2021 */
 .cpu cortex-a53
 .fpu neon-fp-armv8
@@ -41,7 +41,8 @@ that are declared but have not been assigned a value yet. */
 .section .text
 .align 2
 
-.equ SYS_WRITE_C,  0x4
+.equ STDOUT_C,      0x1
+.equ WRITE_C,       0x4
 .equ STATUS_OK_C,  0x71 // Return value OK
 .equ STATUS_NOK_C, 0x82 // Return value NOK
 
@@ -50,10 +51,10 @@ that are declared but have not been assigned a value yet. */
 check_hex_digit:
     push {lr}
 
-//    mov r0, $1                    // syscall
+//    mov r0, STDOUT_C
 //    ldr r1, =str_function_name    // address of text string
 //    ldr r2, =strlen_function_name // number of bytes to write
-//    mov r7, $4                    // SYS_WRITE = 4
+//    mov r7, WRITE_C
 //    swi 0
 
 
@@ -149,10 +150,10 @@ check_hex_digit:
 
 value_ok:
 /*
-    mov r0, $1                      // syscall
+    mov r0, STDOUT_C
     ldr r1, =msg_value_ok           // address of text string
     ldr r2, =strlen_msg_value_ok    // number of bytes to write
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 */
     mov r10, STATUS_OK_C            // hex conversion OK
@@ -160,10 +161,10 @@ value_ok:
     b end
 
 out_of_limits:
-    mov r0, $1                      // syscall
+    mov r0, STDOUT_C
     ldr r1, =msg_err_wrong_value    // address of text string
     ldr r2, =strlen_msg_err_wrong_value // number of bytes to write
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     mov r10, STATUS_NOK_C           // failed. invalid character (not hex)
