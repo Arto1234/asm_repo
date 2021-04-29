@@ -6,7 +6,7 @@ Value is returned in r5 as 32-bit hex value.
 
 Status is returned in r3.
 
-Arto Rasimus 15.4.2021 */
+Arto Rasimus 28.4.2021 */
 .cpu cortex-a53
 .fpu neon-fp-armv8
 .syntax unified
@@ -36,7 +36,7 @@ str_err_read_error:
     .asciz "\ncfg parameter out of limits error\n"
     strlen_err_read_error = .-str_err_read_error
 
-str_buf:             // for debugging purposes
+str_buf:               // for debugging purposes
     .ascii "buf = "
     strlen_buf = .-str_buf
 
@@ -44,17 +44,17 @@ str_dummy:             // for debugging purposes
     .ascii "dummy = "
     strlen_dummy = .-str_dummy
 
-str_rows_read:             // for debugging purposes
+str_rows_read:         // for debugging purposes
     .ascii "rows_read = "
     strlen_rows = .-str_rows_read
 
-str_nl:              // for debugging purposes
+str_nl:                // for debugging purposes
     .asciz "\n"
     strlen_nl = .-str_nl
 
-str_xnl:              // for debugging purposes
-    .asciz "label X\n"
-    strlen_xnl = .-str_xnl
+str_x:
+    .ascii "x"
+    strlen_x = .-str_x
 
 cfg_file_name:       .asciz "gpio_config.cfg"
 
@@ -65,7 +65,6 @@ file_read_retval_addr:    .word   file_read_retval
 file_rows_read:           .word   0
 .global file_rows_read
 file_rows_read_addr:      .word   file_rows_read
-
 
 
 /* ---------------------------------------
@@ -129,9 +128,7 @@ read_cfg_file_row:
     ldr r0, =file_rows_read
     ldr r0, [r0]
     cmp r0, $0          // if nothing has been read yet, open the file for reading
-//    beq open_file
-//    b open_file
-//    b read_next
+    b open_file
 
     // Open the configuration text file, read-only
 open_file:
@@ -157,12 +154,15 @@ open_file:
     svc $0
 
 read_next:
+//bl debug_print
     ldr r0, =file_descriptor
     ldr r0, [r0]
     ldr r1, =file_read_buffer
     mov r2, SIZEOF_VALUE_C
     mov r7, READ_C
     svc $0
+/*
+    mov r9, r1          // save the address of value for later use
 
     mov r0, STDOUT_C
     ldr r1, =str_buf    // address of text string
@@ -175,7 +175,7 @@ read_next:
     mov r2, SIZEOF_VALUE_C
     mov r7, WRITE_C
     svc $0
-
+*/
 /*
     mov r0, STDOUT_C
     ldr r1, =str_nl
@@ -200,6 +200,7 @@ loop:
     // r2 = digit counter (of ASCII chars)
     mov r6, r2
     ldrb r10, [r9], $1
+
     // in: r10, out: r3 ASCII to hex
     bl check_hex_digit   // status: r10 0x71=ok, 0x82=nok
     cmp r10, STATUS_OK_C
@@ -210,10 +211,9 @@ loop:
     orr r5, r4           // bit pattern is placed into final result
 
     sub r2, $1           // decrement the char counter
+
     cmp r2, $0
     bge loop
-
-//    b value_ok
     b dummy
 
 dummy:
@@ -228,48 +228,120 @@ dummy:
     cmp r1, 0x0A    // CR
     bne dummy       // characters are read from line until CR found
 
-//    b increment_rows_read_ctr // rows += 1
-
-
 increment_rows_read_ctr:
-    ldr r0, =file_rows_read // variable addrss
+    ldr r0, =file_rows_read // variable address
     ldr r1, [r0]            // read its value
     add r1, r1, $1          // increment the counter of the read rows
     str r1, [r0]            // Save value to the global variable
 
-    mov r9, r1              // save the row counter value before NL print overwrites r1
+    mov r11, r1              // save the row counter value before NL print overwrites r1
+
     mov r0, STDOUT_C
     ldr r1, =str_nl
     mov r2, $2
     mov r7, WRITE_C
     svc $0
 
-    mov r1, r9              // restore r1
+    mov r0, STDOUT_C
+    ldr r1, =str_rows_read
+    ldr r2, =strlen_rows
+    mov r7, WRITE_C
+    svc $0
+
+    // print tens digit of row number
+    bl number_units_by_10
+
+    ldr r4, =value_10000s
+    ldr r4, [r4]
+    add r4, r4, $48          // for print
+
+    mov r0, STDOUT_C
+    ldr r1, =str_x
+    str r4, [r1]
+    mov r2, $1
+    svc $0
+
+    ldr r4, =value_1000s
+    ldr r4, [r4]
+    add r4, r4, $48          // for print
+
+    mov r0, STDOUT_C
+    ldr r1, =str_x
+    str r4, [r1]
+    mov r2, $1
+    svc $0
+
+    ldr r4, =value_100s
+    ldr r4, [r4]
+    add r4, r4, $48          // for print
+
+    mov r0, STDOUT_C
+    ldr r1, =str_x
+    str r4, [r1]
+    mov r2, $1
+    svc $0
+
+    ldr r4, =value_10s
+    ldr r4, [r4]
+    add r4, r4, $48          // for print
+
+    mov r0, STDOUT_C
+    ldr r1, =str_x
+    str r4, [r1]
+    mov r2, $1
+    svc $0
+
+    ldr r4, =value_1s
+    ldr r4, [r4]
+    add r4, r4, $48          // for print
+
+    mov r0, STDOUT_C
+    ldr r1, =str_x
+    str r4, [r1]
+    mov r2, $1
+    svc $0
+
+    mov r0, STDOUT_C
+    ldr r1, =str_nl
+    mov r2, $1
+    mov r7, WRITE_C
+    svc $0
+
+    ldr r0, =file_rows_read // variable address
+    ldr r6, [r0]            // read its value
+
+    mov r1, r9
+//    mov r3, $26
+//    bne read_next
+//    cmp r11, r3
+//    beq end
+
+    bl gpio_mode_select
     ldr r11, =0x99999999    // end mark
     cmp r5, r11
     bne read_next
     subs r1, $1
-    bl debug_print
+
     mov r3, STATUS_OK_C
     b end
 
 value_ok:
     mov r3, STATUS_OK_C
 
-
 // parameter length <> 8 chars
 wrong_parameter_length:
     mov r3, STATUS_NOK_C
+    b end
 
 // invalid character
 out_of_limits:
+    mov r3, STATUS_NOK_C
+
     mov r0, STDOUT_C
     ldr r1, =str_err_read_error
     mov r2, strlen_err_read_error
     mov r7, WRITE_C
     svc $0
-
-    mov r3, STATUS_NOK_C
     b end
 
 file_open_failed:
@@ -280,37 +352,7 @@ file_open_failed:
     mov r2, strlen_err_file_open_failed
     mov r7, WRITE_C
     svc $0
-
-
-print_rows_read:
-    // debug print the row counter
-    mov r0, STDOUT_C
-    ldr r1, =str_rows_read
-    ldr r2, =strlen_rows
-    mov r7, WRITE_C
-    svc $0
-
-    mov r0, STDOUT_C
-    ldr r1, =file_rows_read  // address
-    ldr r1, [r1]             // current value
-    add r1, r1, $30
-    mov r4, r9             // store updated value to variable
-    mov r2, $5
-    svc $0
-
-    mov r0, STDOUT_C
-//    ldr r1, =file_rows_read
-//    add r1, $1
-/*ldr r1, =$65
-    mov r2, $2               // nr of characters
-    mov r7, WRITE_C
-    svc $0
-*/
-    mov r0, STDOUT_C
-    ldr r1, =str_nl
-    mov r2, $2
-    mov r7, WRITE_C
-    svc $0
+    b end
 
 end:
     // Close the cfg file
@@ -323,9 +365,4 @@ end:
     mov r7, WRITE_C
     svc $0
 
-//bl debug_print
-    /* This creates side effect with above loop:
-       r8:  var addr
-       r9:  out (to print_char)
-       r11: aux addr for var addr */
     pop {pc}
