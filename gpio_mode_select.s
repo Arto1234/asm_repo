@@ -524,13 +524,6 @@ gpfclr1:
     b end
 
 end:
-//    bl debug_print
-    mov r0, STDOUT_C
-    ldr r1, =str_nl         // address of text string
-    ldr r2, =strlen_nl      // number of bytes to write
-    mov r7, SYS_WRITE_C
-    swi 0
-
     pop {pc}
 
 /*
