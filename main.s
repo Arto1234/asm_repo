@@ -45,13 +45,9 @@ _start:
     swi 0
 
     bl gpio_mem_init     // kernel mapped address is returned in mmap_retval variable
-loop:
 //    bl read_input        // return value is stored in r5
     bl read_cfg_file_row   // return value is stored in r5
-    bl gpio_mode_select    // receives modeset value in r5
-    ldr r8, =0x99999999    // EOF
-    cmp r5,  r8
-//    bne loop
+//    bl gpio_mode_select    // receives modeset value in r5
 
 
 /*
