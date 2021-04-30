@@ -1,5 +1,5 @@
 /* number_units_by_10.s
-This function reads 32 bit value from r5 and saves it in following variables:
+This function reads 32 bit value from r11 and saves it in following variables:
        1s in variable: value_1s
       10s in variable: value_10s
      100s in variable: value_100s
@@ -27,7 +27,6 @@ str_value_ok:
     .asciz "Value ok\n"
     strlen_msg_value_ok = .-str_value_ok
 
-
 value_1s:             .word   0
 value_10s:            .word   0
 value_100s:           .word   0
@@ -52,7 +51,6 @@ value_10000s_addr:    .word   value_10000s
    ---------------------------------------
 The portion of an object that contains statically-allocated variables
 that are declared but have not been assigned a value yet. */
-
 
 /* ---------------------------------------
         Code Section
@@ -82,17 +80,17 @@ number_units_by_10:
     //              : r2 has r0 / r1
 
     mov r1, $10             // divisor
-    mov r0, r5              // r5: the value to be divided
+    mov r0, r11             // r11: the value to be divided
     udiv r2, r0, r1         // division <- a / b       ; r2 <- r0 / r1
-    mls  r0, r1, r2, r5     // modulo <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
+    mls  r0, r1, r2, r0     // modulo <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
 
     ldr r8, =value_1s        // load address for the global variable to some reg (r8)
     str r0, [r8]             // save units to the global variable
 
     // division and modulo by 10:
     mov r1, $10             // divisor
-    udiv r6, r5, r1         // division <- a / b       ; r2 <- r0 / r1
-    mov r0, r6              // r6=r5/10: the value to be divided
+    udiv r6, r11, r1        // division <- a / b       ; r2 <- r0 / r1
+    mov r0, r6              // r8=r6/10: the value to be divided
     udiv r2, r0, r1         // division <- a / b       ; r3 <- r0 / r1
     mls  r0, r1, r2, r0     // modulo <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
 
@@ -102,7 +100,7 @@ number_units_by_10:
     // division and modulo by 100:
     mov r1, $10             // divisor
     udiv r6, r6, r1         // division <- a / b       ; r2 <- r0 / r1
-    mov r0, r6              // r6=r5/(10*10): the value to be divided
+    mov r0, r6              // r8=r6/(10*10): the value to be divided
     udiv r2, r0, r1         // division <- a / b       ; r2 <- r0 / r1
     mls  r0, r1, r2, r0      // result2 <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
 
@@ -112,7 +110,7 @@ number_units_by_10:
     // division and modulo by 1000:
     mov r1, $10             // divisor
     udiv r6, r6, r1         // division <- a / b       ; r2 <- r0 / r1
-    mov r0, r6              // r6=r5/(10*10*10): the value to be divided
+    mov r0, r6              // r8=r6/(10*10*10): the value to be divided
     udiv r2, r0, r1         // division <- a / b       ; r2 <- r0 / r1
     mls  r0, r1, r2, r0      // result2 <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
 
@@ -122,7 +120,7 @@ number_units_by_10:
     // division and modulo by 10000:
     mov r1, $10             // divisor
     udiv r6, r6, r1         // division <- a / b       ; r2 <- r0 / r1
-    mov r0, r6              // r6=r5/(10*10*10*10): the value to be divided
+    mov r0, r6              // r8=r6/(10*10*10*10): the value to be divided
     udiv r2, r0, r1         // division <- a / b       ; r2 <- r0 / r1
     mls  r0, r1, r2, r0      // result2 <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
 
