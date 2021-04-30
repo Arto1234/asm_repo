@@ -6,7 +6,7 @@ Value is returned in r5 as 32-bit hex value.
 
 Status is returned in r3.
 
-Arto Rasimus 28.4.2021 */
+Arto Rasimus 30.4.2021 */
 .cpu cortex-a53
 .fpu neon-fp-armv8
 .syntax unified
@@ -91,6 +91,7 @@ that are declared but have not been assigned a value yet */
 .equ STATUS_NOK_C,   0x82 // Return value from check_hex_digit()
 .equ RET_SUCCESS_C,     0
 .equ SIZEOF_VALUE_C,    8
+.equ CR_C,           0x0A // carriage return
 
 // File literals
 .equ READ_C,          0x3
@@ -154,35 +155,36 @@ open_file:
     svc $0
 
 read_next:
-//bl debug_print
     ldr r0, =file_descriptor
     ldr r0, [r0]
     ldr r1, =file_read_buffer
     mov r2, SIZEOF_VALUE_C
     mov r7, READ_C
     svc $0
-/*
-    mov r9, r1          // save the address of value for later use
 
+    mov r9, r1          // save the address of value for later use
+/*
     mov r0, STDOUT_C
     ldr r1, =str_buf    // address of text string
     ldr r2, =strlen_buf // number of bytes to write
     mov r7, WRITE_C
     svc $0
-
+bl debug_print
+*/
     mov r0, STDOUT_C
     ldr r1, =file_read_buffer
     mov r2, SIZEOF_VALUE_C
     mov r7, WRITE_C
     svc $0
-*/
-/*
+
+/*  using this overwrites r1 and r2
     mov r0, STDOUT_C
     ldr r1, =str_nl
     mov r2, $2
     mov r7, WRITE_C
     svc $0
-
+*/
+/*
     mov r0, STDOUT_C
     ldr r1, =str_dummy    // address of text string
     ldr r2, =strlen_dummy // number of bytes to write
@@ -225,7 +227,7 @@ dummy:
     svc $0
 
     ldr r1, [r1]
-    cmp r1, 0x0A    // CR
+    cmp r1, CR_C
     bne dummy       // characters are read from line until CR found
 
 increment_rows_read_ctr:
@@ -311,29 +313,25 @@ increment_rows_read_ctr:
     ldr r6, [r0]            // read its value
 
     mov r1, r9
-//    mov r3, $26
-//    bne read_next
-//    cmp r11, r3
-//    beq end
 
+   // in:r5. func: r12, pin: r9, mode: r8
     bl gpio_mode_select
-    ldr r11, =0x99999999    // end mark
-    cmp r5, r11
-    bne read_next
-    subs r1, $1
+
+    // TBD: 0x99999999 as end mark does not work yet
+    ldr r0, =0x00040000
+    cmp r5, r0
+    beq end
+    b read_next
 
     mov r3, STATUS_OK_C
     b end
 
-value_ok:
-    mov r3, STATUS_OK_C
-
-// parameter length <> 8 chars
+// parameter length <> 8 chars, TBD
 wrong_parameter_length:
     mov r3, STATUS_NOK_C
     b end
 
-// invalid character
+// invalid character (not hex) in config file parameter
 out_of_limits:
     mov r3, STATUS_NOK_C
 
