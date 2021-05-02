@@ -102,6 +102,10 @@ str_wrong_func_sel:
     .asciz "Wrong function selected\n"
     strlen_str_wrong_func_sel = .-str_wrong_func_sel
 
+str_end_mark:
+    .asciz "End mark\n"
+    strlen_str_end_mark = .-str_end_mark
+
 GPIO_BASE_C: .word 0x3F200000 // base address for BCM2836
 gpio_base: .word GPIO_BASE_C
 
@@ -124,6 +128,7 @@ gpio_base: .word GPIO_BASE_C
 
 .equ STDOUT_C,      0x1
 .equ WRITE_C,       0x4
+.equ END_MARK,     0x99
 // Status values are not used yet.
 .equ STATUS_OK_C,  0x71
 .equ STATUS_NOK_C, 0x82
@@ -201,12 +206,15 @@ r10 is used by read_input(), therefore r10 is not used here. */
     and r12, $0x00ff0000    // get byte 2: register
     lsr r12, $16            // shift the bits to byte 0
 
+    // If input parameter = 0x99999999 then no further analysing is needed
+    cmp r12, END_MARK
+    beq end_mark
+
     mov r11, r12
     // Convert the value to ASCII to r11, just for debugging purpose
     add r11, $48
     ldr r6, =function        // load the var addr to r6
     str r11, [r6]            // store the value to var
-
 
     mov r0, STDOUT_C
     ldr r1, =str_mode        // address of text string
@@ -301,7 +309,6 @@ print_wrong_func_sel:
     mov r7, WRITE_C
     swi 0
 
-    
     b end
 
 /* Input param: r5
@@ -523,6 +530,20 @@ gpfclr1:
 
     // Access GPIOs via r0
     str r8, [r0, GPFCLR1_OFFSET_C]  // Write r8 value to GPIO
+    b end
+
+end_mark:
+    mov r0, STDOUT_C
+    ldr r1, =str_end_mark
+    ldr r2, =strlen_str_end_mark
+    mov r7, WRITE_C
+    swi 0
+
+    mov r2, $0
+    mov r3, $0
+    mov r8, $0
+    mov r9, $0
+
     b end
 
 end:
