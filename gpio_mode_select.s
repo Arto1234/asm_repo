@@ -122,10 +122,11 @@ gpio_base: .word GPIO_BASE_C
 .section .text
 .align 2
 
-.equ STDOUT_C,     0x1
-.equ SYS_WRITE_C,  0x4
-.equ STATUS_OK_C,  0x71 // Return value from check_hex_digit()
-.equ STATUS_NOK_C, 0x82 // Return value from check_hex_digit()
+.equ STDOUT_C,      0x1
+.equ WRITE_C,       0x4
+// Status values are not used yet.
+.equ STATUS_OK_C,  0x71
+.equ STATUS_NOK_C, 0x82
 
 .equ GPFSEL0_OFFSET_C, 0x00 // pins  0.. 9 function selection
 .equ GPFSEL1_OFFSET_C, 0x04 // pins 10..19 function selection
@@ -161,7 +162,7 @@ gpio_mode_select:
     mov r0, STDOUT_C
     ldr r1, =str_function_name    // address of text string
     ldr r2, =strlen_function_name // number of bytes to write
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
 //bl debug_print
@@ -210,55 +211,55 @@ r10 is used by read_input(), therefore r10 is not used here. */
     mov r0, STDOUT_C
     ldr r1, =str_mode        // address of text string
     ldr r2, =strlen_mode     // number of bytes to write
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     mov r0, STDOUT_C
     ldr r1, =mode
     ldr r2, =strlen_nl
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     mov r0, STDOUT_C
     ldr r1, =str_nl
     ldr r2, =strlen_nl
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     mov r0, STDOUT_C
     ldr r1, =str_pin
     ldr r2, =strlen_pin
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     mov r0, STDOUT_C
     ldr r1, =pin
     ldr r2, =strlen_nl
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     mov r0, STDOUT_C
     ldr r1, =str_nl
     ldr r2, =strlen_nl
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     mov r0, STDOUT_C
     ldr r1, =str_function
     ldr r2, =strlen_function
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     mov r0, STDOUT_C
     ldr r1, =function
     ldr r2, =strlen_nl
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     mov r0, STDOUT_C
     ldr r1, =str_nl
     ldr r2, =strlen_nl
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     cmp r12, $0              // checked if r12 == 0: GPFSEL0
@@ -297,9 +298,10 @@ print_wrong_func_sel:
     mov r0, STDOUT_C
     ldr r1, =str_wrong_func_sel        // address of text string
     ldr r2, =strlen_str_wrong_func_sel // number of bytes to write
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
+    
     b end
 
 /* Input param: r5
@@ -319,7 +321,7 @@ gpfsel0:
     mov r0, STDOUT_C
     ldr r1, =str_gpfsel0            // address of text string
     ldr r2, =strlen_str_func0_sel   // number of bytes to write
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     // 3 * pin_nr: to the place of correct bit
@@ -338,7 +340,7 @@ gpfsel1:
     mov r0, STDOUT_C
     ldr r1, =str_gpfsel1            // address of text string
     ldr r2, =strlen_str_func1_sel   // number of bytes to write
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     // 3 * pin_nr: to the place of correct bit
@@ -359,7 +361,7 @@ gpfsel2:
     mov r0, STDOUT_C
     ldr r1, =str_gpfsel2            // address of text string
     ldr r2, =strlen_str_func2_sel   // number of bytes to write
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     // 3 * pin_nr: to the place of correct bit
@@ -380,7 +382,7 @@ gpfsel3:
     mov r0, STDOUT_C
     ldr r1, =str_gpfsel3            // address of text string
     ldr r2, =strlen_str_func3_sel   // number of bytes to write
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     // 3 * pin_nr: to the place of correct bit
@@ -401,7 +403,7 @@ gpfsel4:
     mov r0, STDOUT_C
     ldr r1, =str_gpfsel4            // address of text string
     ldr r2, =strlen_str_func4_sel   // number of bytes to write
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     // 3 * pin_nr: to the place of correct bit
@@ -422,7 +424,7 @@ gpfsel5:
     mov r0, STDOUT_C
     ldr r1, =str_gpfsel5            // address of text string
     ldr r2, =strlen_str_func5_sel   // number of bytes to write
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     // 3 * pin_nr: to the place of correct bit
@@ -443,7 +445,7 @@ gpfset0:
     mov r0, STDOUT_C
     ldr r1, =str_gpfset0            // address of text string
     ldr r2, =strlen_str_func0_set   // number of bytes to write
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     // 3 * pin_nr: to the place of correct bit
@@ -464,7 +466,7 @@ gpfset1:
     mov r0, STDOUT_C
     ldr r1, =str_gpfset1            // address of text string
     ldr r2, =strlen_str_func1_set   // number of bytes to write
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     // 3 * pin_nr: to the place of correct bit
@@ -485,7 +487,7 @@ gpfclr0:
     mov r0, STDOUT_C
     ldr r1, =str_gpfclr0            // address of text string
     ldr r2, =strlen_str_func0_clr   // number of bytes to write
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     // 3 * pin_nr: to the place of correct bit
@@ -506,7 +508,7 @@ gpfclr1:
     mov r0, STDOUT_C
     ldr r1, =str_gpfclr1            // address of text string
     ldr r2, =strlen_str_func1_clr   // number of bytes to write
-    mov r7, SYS_WRITE_C
+    mov r7, WRITE_C
     swi 0
 
     // 3 * pin_nr: to the place of correct bit
