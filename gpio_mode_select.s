@@ -128,7 +128,7 @@ gpio_base: .word GPIO_BASE_C
 
 .equ STDOUT_C,      0x1
 .equ WRITE_C,       0x4
-.equ END_MARK,     0x99
+.equ END_MARK,      0x00999999
 // Status values are not used yet.
 .equ STATUS_OK_C,  0x71
 .equ STATUS_NOK_C, 0x82
@@ -178,6 +178,12 @@ begin:
 |          |    r12   |    r9    |    r8    |
 ---------------------------------------------
 r10 is used by read_input(), therefore r10 is not used here. */
+    // If input parameter = 0x99999999 then no further analysing is needed
+    ldr r1, =END_MARK
+    cmp r5, r1
+    b end_mark
+
+
     ldr r0, =GPIO_BASE_C            // load GPIO start address
 
     // mode ----------------------------------
@@ -205,10 +211,6 @@ r10 is used by read_input(), therefore r10 is not used here. */
     mov r12, r5             // save input param to local use
     and r12, $0x00ff0000    // get byte 2: register
     lsr r12, $16            // shift the bits to byte 0
-
-    // If input parameter = 0x99999999 then no further analysing is needed
-    cmp r12, END_MARK
-    beq end_mark
 
     mov r11, r12
     // Convert the value to ASCII to r11, just for debugging purpose
@@ -543,7 +545,7 @@ end_mark:
     mov r3, $0
     mov r8, $0
     mov r9, $0
-
+bl debug_print
     b end
 
 end:
