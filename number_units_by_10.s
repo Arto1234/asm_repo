@@ -79,53 +79,55 @@ number_units_by_10:
     // Postcondition: r0 has the result of r0 % r1
     //              : r2 has r0 / r1
 
+    // units part (r0) is just modulo by 10 from the input parameter (original value)
     mov r1, $10             // divisor
     mov r0, r11             // r11: the value to be divided
     udiv r2, r0, r1         // division <- a / b       ; r2 <- r0 / r1
     mls  r0, r1, r2, r0     // modulo <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
 
-    ldr r8, =value_1s        // load address for the global variable to some reg (r8)
-    str r0, [r8]             // save units to the global variable
+    ldr r8, =value_1s       // load address for the global variable to some reg (r8)
+    str r0, [r8]            // save units part to the global variable
 
     // division and modulo by 10:
     mov r1, $10             // divisor
-    udiv r6, r11, r1        // division <- a / b       ; r2 <- r0 / r1
-    mov r0, r6              // r8=r6/10: the value to be divided
-    udiv r2, r0, r1         // division <- a / b       ; r3 <- r0 / r1
+    // r11 = input parameter
+    udiv r6, r11, r1        // division <- a / b       ; r6 <- r11 / r1
+    mov r0, r6              // r0 = r6/10: the value to be divided
+    udiv r2, r0, r1         // division <- a / b       ; r2 <- r0 / r1
     mls  r0, r1, r2, r0     // modulo <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
 
-    ldr r8, =value_10s       // load address for the global variable to some reg (r8)
-    str r0, [r8]             // save 10s to the global variable
+    ldr r8, =value_10s      // load address for the global variable to some reg (r8)
+    str r0, [r8]            // save 10s to the global variable
 
     // division and modulo by 100:
     mov r1, $10             // divisor
-    udiv r6, r6, r1         // division <- a / b       ; r2 <- r0 / r1
-    mov r0, r6              // r8=r6/(10*10): the value to be divided
+    udiv r6, r6, r1         // division <- a / b       ; r6 <- r6 / r1
+    mov r0, r6              // r0 = r6/(10*10): the value to be divided
     udiv r2, r0, r1         // division <- a / b       ; r2 <- r0 / r1
-    mls  r0, r1, r2, r0      // result2 <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
+    mls  r0, r1, r2, r0     // result2 <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
 
-    ldr r8, =value_100s      // load address for the global variable to some reg (r8)
-    str r0, [r8]             // save 100s to the global variable
+    ldr r8, =value_100s     // load address for the global variable to some reg (r8)
+    str r0, [r8]            // save 100s to the global variable
 
     // division and modulo by 1000:
     mov r1, $10             // divisor
-    udiv r6, r6, r1         // division <- a / b       ; r2 <- r0 / r1
-    mov r0, r6              // r8=r6/(10*10*10): the value to be divided
+    udiv r6, r6, r1         // division <- a / b       ; r6 <- r6 / r1
+    mov r0, r6              // r0 = r6/(10*10*10): the value to be divided
     udiv r2, r0, r1         // division <- a / b       ; r2 <- r0 / r1
-    mls  r0, r1, r2, r0      // result2 <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
+    mls  r0, r1, r2, r0     // result2 <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
 
-    ldr r8, =value_1000s     // load address for the global variable to some reg (r8)
-    str r0, [r8]             // save 1000s to the global variable
+    ldr r8, =value_1000s    // load address for the global variable to some reg (r8)
+    str r0, [r8]            // save 1000s to the global variable
 
     // division and modulo by 10000:
     mov r1, $10             // divisor
-    udiv r6, r6, r1         // division <- a / b       ; r2 <- r0 / r1
-    mov r0, r6              // r8=r6/(10*10*10*10): the value to be divided
+    udiv r6, r6, r1         // division <- a / b       ; r6 <- r6 / r1
+    mov r0, r6              // r0 = r6/(10*10*10*10): the value to be divided
     udiv r2, r0, r1         // division <- a / b       ; r2 <- r0 / r1
-    mls  r0, r1, r2, r0      // result2 <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
+    mls  r0, r1, r2, r0     // result2 <- a - (b * 1) ; r0 <- r0 - (r1 * r2 )
 
-    ldr r8, =value_10000s     // load address for the global variable to some reg (r8)
-    str r0, [r8]             // save 1000s to the global variable
+    ldr r8, =value_10000s   // load address for the global variable to some reg (r8)
+    str r0, [r8]            // save 1000s to the global variable
 
     b end
 
@@ -139,6 +141,7 @@ value_ok:
     mov r10, STATUS_OK_C
     b end
 
+/*
 out_of_limits:
     mov r0, STDOUT_C
     ldr r1, =str_err_wrong_value        // address of text string
@@ -148,6 +151,6 @@ out_of_limits:
 
     mov r10, STATUS_NOK_C               // failed
     b end
-
+*/
 end:
     pop {pc}
