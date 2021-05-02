@@ -92,6 +92,7 @@ that are declared but have not been assigned a value yet */
 .equ RET_SUCCESS_C,     0
 .equ SIZEOF_VALUE_C,    8
 .equ CR_C,           0x0A // carriage return
+.equ END_MARK, 0x00999999
 
 // File literals
 .equ READ_C,          0x3
@@ -318,8 +319,8 @@ increment_rows_read_ctr:
     bl gpio_mode_select
 
     // TBD: 0x99999999 as end mark does not work yet
-    ldr r0, =0x00040000
-    cmp r5, r0
+    ldr r1, =END_MARK
+    cmp r5, r1
     beq end
     b read_next
 
