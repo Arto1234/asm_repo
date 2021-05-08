@@ -163,13 +163,13 @@ gpio_base: .word GPIO_BASE_C
 .type gpio_mode_select, %function
 gpio_mode_select:
     push {lr}
-
+/*
     mov r0, STDOUT_C
     ldr r1, =str_function_name    // address of text string
     ldr r2, =strlen_function_name // number of bytes to write
     mov r7, WRITE_C
     swi 0
-
+*/
 //bl debug_print
 begin:
 /* Input param: r5
@@ -535,17 +535,18 @@ gpfclr1:
     b end
 
 end_mark:
+/*
     mov r0, STDOUT_C
     ldr r1, =str_end_mark
     ldr r2, =strlen_str_end_mark
     mov r7, WRITE_C
     swi 0
-
+*/
     mov r2, $0
     mov r3, $0
     mov r8, $0
     mov r9, $0
-bl debug_print
+//bl debug_print
     b end
 
 end:
