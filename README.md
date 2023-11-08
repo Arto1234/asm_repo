@@ -8,7 +8,7 @@ assembly language, starting on January 2021.
 The program is still under construction.
 Purpose 1: To learn basics of ARM assembly.
 Purpose 2: To create a way to make GPIO modeset configurations for Raspberry Pi.
-           Configuration parameters are read from a text file that has certain format.
+           Configuration parameters are read from a text file (gpio_config.cfg) that has certain format.
            DONE 2 May 2021
 
 TODO:
